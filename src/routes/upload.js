@@ -50,26 +50,31 @@ router.post('/', upload.single('projectFile'), async (req, res) => {
     const projectDir = path.join(process.cwd(), 'projects', projectId);
 
     try {
-        // Klasörü oluştur
-        await fs.ensureDir(projectDir);
+        // Geçici bir çıkartma klasörü oluştur
+        const tempExtractDir = path.join(process.cwd(), 'uploads', projectId + '_temp');
+        await fs.ensureDir(tempExtractDir);
 
-        // Zip'i çıkart
+        // Zip'i geçici klasöre çıkart
         const zip = new AdmZip(req.file.path);
-        zip.extractAllTo(projectDir, true);
+        zip.extractAllTo(tempExtractDir, true);
 
         // Geçici zip dosyasını sil
         await fs.remove(req.file.path);
 
-        // İç içe klasör kontrolü (Eğer zip içindeki tek şey bir klasörse, içeriğini bir üst dizine taşı)
-        const items = await fs.readdir(projectDir);
-        if (items.length === 1 && (await fs.stat(path.join(projectDir, items[0]))).isDirectory()) {
-            const subDir = path.join(projectDir, items[0]);
-            const subItems = await fs.readdir(subDir);
-            for (const item of subItems) {
-                await fs.move(path.join(subDir, item), path.join(projectDir, item));
-            }
-            await fs.remove(subDir);
+        // İç içe klasör kontrolü
+        const items = await fs.readdir(tempExtractDir);
+        let sourceDir = tempExtractDir;
+        
+        // Eğer zip'in içinde sadece 1 tane klasör varsa (ve başka dosya yoksa), asıl proje dizini o klasörün içi olsun
+        if (items.length === 1 && (await fs.stat(path.join(tempExtractDir, items[0]))).isDirectory()) {
+            sourceDir = path.join(tempExtractDir, items[0]);
         }
+
+        // Klasörleri asıl proje dizinine güvenle taşı
+        await fs.move(sourceDir, projectDir, { overwrite: true });
+        
+        // Artık klasörü temizle
+        await fs.remove(tempExtractDir).catch(() => {});
 
         // Projeyi veritabanına kaydet
         const projectsData = JSON.parse(await fs.readFile('data/projects.json', 'utf8'));
