@@ -1,0 +1,30 @@
+# Bağımlılıklar
+node_modules/
+
+# Ortam değişkenleri (GİZLİ - Asla commit etme!)
+.env
+
+# Yüklenen kullanıcı dosyaları
+uploads/
+projects/
+
+# Veri dosyaları (production'da gerçek veriler)
+data/users.json
+data/projects.json
+data/announcements.json
+
+# Log dosyaları
+*.log
+logs/
+
+# OS Dosyaları
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Build
+dist/
+build/

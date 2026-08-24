@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APEX | Owner Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/owner.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="owner-layout" id="owner-app" style="display:none;">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="brand">
+                <i class="fa-solid fa-crown text-warning"></i> APEX <span>|</span> OWNER
+            </div>
+            
+            <div class="stats-row">
+                <div class="stat-box">
+                    <i class="fa-solid fa-microchip text-primary"></i>
+                    <div>
+                        <span class="label">CPU</span>
+                        <strong id="stat-cpu">0%</strong>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <i class="fa-solid fa-memory text-apex"></i>
+                    <div>
+                        <span class="label">RAM</span>
+                        <strong id="stat-ram">0 / 0 GB</strong>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <i class="fa-solid fa-server text-success"></i>
+                    <div>
+                        <span class="label">Aktif Proje</span>
+                        <strong id="stat-active">0 / 0</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <a href="/dashboard" class="btn-small"><i class="fa-solid fa-users"></i> Müşteri Paneline Dön</a>
+                <a href="/auth/logout" class="btn-small danger" style="margin-left: 10px;"><i class="fa-solid fa-power-off"></i> Çıkış</a>
+            </div>
+        </header>
+
+        <main class="content-grid">
+            <!-- Sol: Kullanıcılar ve Projeler -->
+            <div class="panel">
+                <div class="panel-header">Tüm Müşteriler ve Projeler</div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Kullanıcı</th>
+                                <th>Durum</th>
+                                <th>Projeler</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table">
+                            <tr><td colspan="4">Yükleniyor...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sağ: Araçlar (Duyuru, Detaylar) -->
+            <div class="side-panel">
+                <div class="panel">
+                    <div class="panel-header">Genel Duyuru Yayınla</div>
+                    <div class="panel-body">
+                        <input type="text" id="ann-title" class="form-input" placeholder="Duyuru Başlığı" style="margin-bottom: 10px;">
+                        <textarea id="ann-msg" class="form-input" rows="4" placeholder="Duyuru Mesajı..." style="margin-bottom: 10px;"></textarea>
+                        <select id="ann-type" class="form-input" style="margin-bottom: 10px;">
+                            <option value="info">Bilgi (Mavi)</option>
+                            <option value="success">İyi Haber (Yeşil)</option>
+                            <option value="warning">Uyarı (Sarı)</option>
+                            <option value="danger">Acil (Kırmızı)</option>
+                        </select>
+                        <button class="btn-primary w-100" onclick="sendAnnouncement()">Yayınla</button>
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-top: 1rem;">
+                    <div class="panel-header">Sistem Kontrolü</div>
+                    <div class="panel-body">
+                        <button class="btn-primary warning w-100" style="margin-bottom: 10px;"><i class="fa-solid fa-rotate"></i> Tüm Projeleri Yeniden Başlat</button>
+                        <button class="btn-primary danger w-100"><i class="fa-solid fa-triangle-exclamation"></i> Acil Durdurma (Kill All)</button>
+                        <p style="color:var(--text-muted); font-size: 0.8rem; margin-top: 10px;">
+                            Dikkat: Bu işlemler sunucudaki tüm çalışan bot ve siteleri etkiler.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/owner.js"></script>
+</body>
+</html>
