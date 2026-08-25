@@ -30,7 +30,7 @@
             <!-- Giriş Formu -->
             <form id="loginForm" class="auth-form active" onsubmit="handleAuth(event, 'login')">
                 <div class="form-group">
-                    <input type="text" id="loginUsername" placeholder="Kullanıcı Adı" required autocomplete="off">
+                    <input type="text" id="loginDiscordId" placeholder="Discord ID (Sayısal)" required autocomplete="off">
                 </div>
                 <div class="form-group">
                     <input type="password" id="loginPassword" placeholder="Şifre" required>
@@ -114,13 +114,15 @@
             btn.disabled = true;
 
             let bodyData = {
-                username: document.getElementById(`${type}Username`).value,
                 password: document.getElementById(`${type}Password`).value,
                 captcha: document.getElementById(`${type}Captcha`).value
             };
 
-            if (type === 'register') {
+            if (type === 'login') {
+                bodyData.discordId = document.getElementById('loginDiscordId').value;
+            } else {
                 bodyData.discordId = document.getElementById('registerDiscordId').value;
+                bodyData.username = document.getElementById('registerUsername').value;
                 bodyData.passwordConfirm = document.getElementById('registerPasswordConfirm').value;
             }
 

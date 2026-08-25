@@ -78,8 +78,11 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
+const FileStore = require('session-file-store')(session);
+
 // Session yapılandırması
 app.use(session({
+    store: new FileStore({ path: './data/sessions', logFn: function(){} }),
     secret: process.env.SESSION_SECRET || 'apex_default_secret_123',
     resave: false,
     saveUninitialized: false,

@@ -60,15 +60,15 @@ router.post('/register', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-    const { username, password, captcha } = req.body;
+    const { discordId, password, captcha } = req.body;
     
-    if (!username || !password || !captcha) return res.status(400).json({ success: false, message: 'Tüm alanları doldurun.' });
+    if (!discordId || !password || !captcha) return res.status(400).json({ success: false, message: 'Tüm alanları doldurun.' });
     if (!req.session.captcha || req.session.captcha !== captcha.toLowerCase()) return res.status(400).json({ success: false, message: 'Güvenlik kodu hatalı!' });
     
     const users = getUsers();
-    const user = Object.values(users).find(u => u.username.toLowerCase() === username.toLowerCase());
+    const user = Object.values(users).find(u => u.discordId === discordId);
     
-    if (!user) return res.status(401).json({ success: false, message: 'Kullanıcı adı veya şifre hatalı.' });
+    if (!user) return res.status(401).json({ success: false, message: 'Discord ID veya şifre hatalı.' });
     if (user.banned) return res.status(403).json({ success: false, message: 'Hesabınız yasaklanmıştır.' });
     
     try {
