@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ============================================
  * APEX | Hosting â€” Projects Routes
  * KullanÄ±cÄ±larÄ±n projelerini listeleme, durdurma/baÅŸlatma
@@ -151,8 +151,8 @@ router.post('/:id/status-config', async (req, res) => {
         envContent = envContent.split('\n').filter(line => !line.startsWith('BOT_STATUS_TYPE=') && !line.startsWith('BOT_STATUS_TEXT=')).join('\n');
         
         // Yeni durumlari ekle
-        envContent += \nBOT_STATUS_TYPE= + type;
-        envContent += \nBOT_STATUS_TEXT=" + text + ";
+        envContent += "\\nBOT_STATUS_TYPE=" + type;
+        envContent += "\\nBOT_STATUS_TEXT=\"" + text + "\"";
         
         await fs.writeFile(envPath, envContent.trim());
         res.json({ success: true, message: 'Bot durumu .env dosyasina kaydedildi. Yeniden baslatildiginda aktif olur.' });
