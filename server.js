@@ -35,6 +35,7 @@ require('fs').existsSync('.env') && require('fs').readFileSync('.env', 'utf8').s
 });
 
 const app = express();
+app.set('trust proxy', 1); // Railway (Reverse Proxy) HTTPS trafiğini doğru algılaması için gerekli
 const server = http.createServer(app);
 
 // ─── WebSocket Sunucusu (Canlı Log Akışı) ───────────────────────────────────
