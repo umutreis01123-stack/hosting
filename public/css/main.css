@@ -1,4 +1,4 @@
-:root {
+﻿:root {
     --bg-dark: #0f1115;
     --bg-panel: #161920;
     --bg-card: #1c1f28;
@@ -278,4 +278,58 @@ body {
 .captcha-group input {
     flex: 1;
     margin-bottom: 0;
+}
+
+
+/* Owner Modal Tam Ekran Arkaplan Düzeltmesi */
+html, body {
+    min-height: 100vh;
+    background-color: var(--bg, #13131a);
+}
+
+.owner-modal-content {
+    background: var(--secondary, #1e1e2e);
+    border: 1px solid var(--border, #2a2a3d);
+    border-radius: 12px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.owner-modal-content h2 {
+    color: #ffb86c;
+    margin-bottom: 0.75rem;
+    font-size: 1.4rem;
+}
+
+.owner-modal-content p {
+    color: var(--text-muted, #888);
+    margin-bottom: 1.5rem;
+}
+
+.owner-modal-content input {
+    width: 100%;
+    background: var(--bg, #13131a);
+    border: 1px solid var(--border, #2a2a3d);
+    color: var(--text, #eee);
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    box-sizing: border-box;
+}
+
+.owner-modal-content input:focus {
+    outline: none;
+    border-color: #ffb86c;
+}
+
+.error-text {
+    color: #ff5555;
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+    min-height: 1.2em;
 }
