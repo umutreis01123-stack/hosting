@@ -45,10 +45,16 @@
             <!-- Kayıt Formu -->
             <form id="registerForm" class="auth-form" style="display: none;" onsubmit="handleAuth(event, 'register')">
                 <div class="form-group">
+                    <input type="text" id="registerDiscordId" placeholder="Discord ID (Sayısal)" required autocomplete="off">
+                </div>
+                <div class="form-group">
                     <input type="text" id="registerUsername" placeholder="Kullanıcı Adı" required autocomplete="off">
                 </div>
                 <div class="form-group">
                     <input type="password" id="registerPassword" placeholder="Şifre" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="registerPasswordConfirm" placeholder="Şifre (Tekrar)" required>
                 </div>
                 <div class="captcha-group">
                     <img src="/auth/captcha" id="registerCaptchaImg" onclick="refreshCaptcha('register')" title="Yenilemek için tıklayın">
@@ -104,18 +110,25 @@
             e.preventDefault();
             const btn = e.target.querySelector('button');
             const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Lütfen Bekleyin...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> İşleniyor...';
             btn.disabled = true;
 
-            const username = document.getElementById(`${type}Username`).value;
-            const password = document.getElementById(`${type}Password`).value;
-            const captcha = document.getElementById(`${type}Captcha`).value;
+            let bodyData = {
+                username: document.getElementById(`${type}Username`).value,
+                password: document.getElementById(`${type}Password`).value,
+                captcha: document.getElementById(`${type}Captcha`).value
+            };
+
+            if (type === 'register') {
+                bodyData.discordId = document.getElementById('registerDiscordId').value;
+                bodyData.passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+            }
 
             try {
                 const res = await fetch(`/auth/${type}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password, captcha })
+                    body: JSON.stringify(bodyData)
                 });
                 
                 const data = await res.json();

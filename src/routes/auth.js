@@ -33,28 +33,31 @@ router.get('/captcha', (req, res) => {
 });
 
 router.post('/register', async (req, res) => {
-    const { username, password, captcha } = req.body;
+    const { discordId, username, password, passwordConfirm, captcha } = req.body;
     
-    if (!username || !password || !captcha) return res.status(400).json({ success: false, message: 'Tüm alanları doldurun.' });
+    if (!discordId || !username || !password || !passwordConfirm || !captcha) return res.status(400).json({ success: false, message: 'Tüm alanları doldurun.' });
+    if (password !== passwordConfirm) return res.status(400).json({ success: false, message: 'Şifreler birbiriyle uyuşmuyor.' });
     if (username.length < 3 || username.length > 20) return res.status(400).json({ success: false, message: 'Kullanıcı adı 3-20 karakter olmalı.' });
     if (!req.session.captcha || req.session.captcha !== captcha.toLowerCase()) return res.status(400).json({ success: false, message: 'Güvenlik kodu hatalı!' });
     
     const users = getUsers();
     const usernameExists = Object.values(users).some(u => u.username.toLowerCase() === username.toLowerCase());
     if (usernameExists) return res.status(400).json({ success: false, message: 'Bu kullanıcı adı zaten alınmış.' });
+    const discordIdExists = Object.values(users).some(u => u.discordId === discordId);
+    if (discordIdExists) return res.status(400).json({ success: false, message: 'Bu Discord ID zaten kayıtlı.' });
     
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         const userId = uuidv4();
         
         users[userId] = {
-            id: userId, username, password: hashedPassword,
+            id: userId, discordId, username, password: hashedPassword,
             createdAt: new Date().toISOString(), banned: false,
             avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=random`
         };
         saveUsers(users);
         
-        req.session.user = { id: userId, username, avatar: users[userId].avatar, loggedInAt: new Date().toISOString() };
+        req.session.user = { id: userId, discordId, username, avatar: users[userId].avatar, loggedInAt: new Date().toISOString() };
         req.session.captcha = null;
         res.json({ success: true, message: 'Kayıt başarılı! Yönlendiriliyorsunuz...' });
     } catch (err) {
@@ -78,10 +81,12 @@ router.post('/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(401).json({ success: false, message: 'Kullanıcı adı veya şifre hatalı.' });
         
-        req.session.user = { id: user.id, username: user.username, avatar: user.avatar, loggedInAt: new Date().toISOString() };
+        req.session.user = { id: user.id, discordId: user.discordId, username: user.username, avatar: user.avatar, loggedInAt: new Date().toISOString() };
         req.session.captcha = null;
         
-        if (user.username === 'umutpapa123') {
+        // Eğer kurucuysa owner flagini ayarla (Discord ID'den kontrol et)
+        const ownerDiscordId = process.env.OWNER_DISCORD_ID || '1403495996138323989';
+        if (user.discordId === ownerDiscordId) {
             req.session.isOwner = false;
             req.session.ownerPending = true;
             return res.json({ success: true, message: 'Kurucu girişi tespit edildi.', isOwner: true });
