@@ -34,12 +34,8 @@ RUN [ ! -f data/users.json ] && echo "{}" > data/users.json || true
 RUN [ ! -f data/projects.json ] && echo "{}" > data/projects.json || true
 RUN [ ! -f data/announcements.json ] && echo "[]" > data/announcements.json || true
 
-# Port
+# Port (Railway bunu dikkate almayıp kendi portunu atar)
 EXPOSE 3000
-
-# Sağlık kontrolü
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:3000/health || exit 1
 
 # Uygulamayı başlat
 CMD ["node", "server.js"]
