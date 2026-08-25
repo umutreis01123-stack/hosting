@@ -34,5 +34,8 @@ RUN [ ! -f data/users.json ] && echo "{}" > data/users.json || true
 RUN [ ! -f data/projects.json ] && echo "{}" > data/projects.json || true
 RUN [ ! -f data/announcements.json ] && echo "[]" > data/announcements.json || true
 
+# Port
+EXPOSE 8080
+
 # Uygulamayı başlat
 CMD ["node", "server.js"]
