@@ -119,9 +119,21 @@ router.get('/me', (req, res) => {
         return res.json({ loggedIn: false });
     }
 
+    // Kullanicinin kredi bilgisini oku
+    let credits = 0;
+    try {
+        if (fs.existsSync('data/users.json')) {
+            const users = JSON.parse(fs.readFileSync('data/users.json', 'utf8'));
+            if (users[req.session.user.id]) {
+                credits = users[req.session.user.id].credits || 0;
+            }
+        }
+    } catch(e) {}
+
     res.json({
         loggedIn: true,
         user: req.session.user,
+        credits: Math.floor(credits),
         isOwner: req.session.isOwner || false,
         ownerPending: req.session.ownerPending || false
     });
@@ -181,7 +193,7 @@ function saveUser(discordUser) {
                 : null,
             email: discordUser.email,
             lastLogin: new Date().toISOString(),
-            ...(isNew && { createdAt: new Date().toISOString(), banned: false })
+            ...(isNew && { createdAt: new Date().toISOString(), banned: false, credits: 0 })
         };
 
         fs.writeFileSync('data/users.json', JSON.stringify(usersData, null, 2));

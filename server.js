@@ -1,6 +1,6 @@
 /**
  * ============================================
- * APEX | Hosting — Ana Sunucu (server.js)
+ * APEX | Hosting â€” Ana Sunucu (server.js)
  * Express.js + WebSocket + Discord OAuth2
  * ============================================
  */
@@ -16,8 +16,9 @@ const fs = require('fs');
 const http = require('http');
 const WebSocket = require('ws');
 
-// Yardımcı modüller
+// YardÄ±mcÄ± modÃ¼ller
 const processManager = require('./src/utils/processManager');
+const creditManager = require('./src/utils/creditManager');
 
 // Route'lar
 const authRoutes = require('./src/routes/auth');
@@ -25,8 +26,9 @@ const uploadRoutes = require('./src/routes/upload');
 const projectRoutes = require('./src/routes/projects');
 const editorRoutes = require('./src/routes/editor');
 const ownerRoutes = require('./src/routes/owner');
+const supportRoutes = require('./src/routes/support');
 
-// Ortam değişkenlerini yükle
+// Ortam deÄŸiÅŸkenlerini yÃ¼kle
 require('fs').existsSync('.env') && require('fs').readFileSync('.env', 'utf8').split('\n').forEach(line => {
     const [key, ...val] = line.split('=');
     if (key && !key.startsWith('#') && val.length) {
@@ -35,10 +37,10 @@ require('fs').existsSync('.env') && require('fs').readFileSync('.env', 'utf8').s
 });
 
 const app = express();
-app.set('trust proxy', 1); // Railway (Reverse Proxy) HTTPS trafiğini doğru algılaması için gerekli
+app.set('trust proxy', 1); // Railway (Reverse Proxy) HTTPS trafiÄŸini doÄŸru algÄ±lamasÄ± iÃ§in gerekli
 const server = http.createServer(app);
 
-// ─── WebSocket Sunucusu (Canlı Log Akışı) ───────────────────────────────────
+// â”€â”€â”€ WebSocket Sunucusu (CanlÄ± Log AkÄ±ÅŸÄ±) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const wss = new WebSocket.Server({ server, path: '/ws' });
 
 wss.on('connection', (ws, req) => {
@@ -51,7 +53,7 @@ wss.on('connection', (ws, req) => {
         return;
     }
 
-    // Log akışına kaydol
+    // Log akÄ±ÅŸÄ±na kaydol
     processManager.subscribeToLogs(projectId, ws);
 
     ws.on('close', () => {
@@ -59,12 +61,12 @@ wss.on('connection', (ws, req) => {
     });
 });
 
-// Tüm istemcilere log broadcast için processManager'a wss'i ver
+// TÃ¼m istemcilere log broadcast iÃ§in processManager'a wss'i ver
 processManager.setWss(wss);
 
-// ─── Middleware ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Middleware â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 app.use(helmet({
-    contentSecurityPolicy: false, // CDN kaynaklarına izin ver
+    contentSecurityPolicy: false, // CDN kaynaklarÄ±na izin ver
     crossOriginEmbedderPolicy: false
 }));
 
@@ -80,7 +82,7 @@ app.use(cookieParser());
 
 const FileStore = require('session-file-store')(session);
 
-// Session yapılandırması
+// Session yapÄ±landÄ±rmasÄ±
 app.use(session({
     store: new FileStore({ path: './data/sessions', logFn: function(){} }),
     secret: process.env.SESSION_SECRET || 'apex_default_secret_123',
@@ -89,20 +91,20 @@ app.use(session({
     cookie: {
         secure: process.env.NODE_ENV === 'production' && process.env.APP_URL?.startsWith('https'),
         httpOnly: true,
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 gün
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 gÃ¼n
     }
 }));
 
-// ─── Statik Dosyalar ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Statik Dosyalar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ─── Gerekli Klasörleri Oluştur ──────────────────────────────────────────────
+// â”€â”€â”€ Gerekli KlasÃ¶rleri OluÅŸtur â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const requiredDirs = ['uploads', 'projects', 'data'];
 requiredDirs.forEach(dir => {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 });
 
-// Veri dosyalarını başlat
+// Veri dosyalarÄ±nÄ± baÅŸlat
 const dataFiles = {
     'data/users.json': '{}',
     'data/projects.json': '{}',
@@ -112,14 +114,15 @@ Object.entries(dataFiles).forEach(([file, defaultContent]) => {
     if (!fs.existsSync(file)) fs.writeFileSync(file, defaultContent);
 });
 
-// ─── API Route'ları ──────────────────────────────────────────────────────────
+// â”€â”€â”€ API Route'larÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 app.use('/auth', authRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/editor', editorRoutes);
 app.use('/api/owner', ownerRoutes);
+app.use('/api', supportRoutes);
 
-// ─── Sağlık Kontrolü ─────────────────────────────────────────────────────────
+// â”€â”€â”€ SaÄŸlÄ±k KontrolÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 app.get('/health', (req, res) => {
     res.json({
         status: 'OK',
@@ -129,13 +132,13 @@ app.get('/health', (req, res) => {
     });
 });
 
-// ─── Sayfa Yönlendirmeleri ────────────────────────────────────────────────────
+// â”€â”€â”€ Sayfa YÃ¶nlendirmeleri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Ana sayfa
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Dashboard (giriş kontrolü middleware ile yapılır)
+// Dashboard (giriÅŸ kontrolÃ¼ middleware ile yapÄ±lÄ±r)
 app.get('/dashboard', (req, res) => {
     if (!req.session.user) {
         return res.redirect('/?error=login_required');
@@ -154,12 +157,12 @@ app.get('/owner', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'owner.html'));
 });
 
-// ─── Hata Yönetimi ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Hata YÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 app.use((err, req, res, next) => {
     console.error('[APEX ERROR]', err.stack);
     res.status(err.status || 500).json({
         success: false,
-        message: err.message || 'Sunucu hatası oluştu',
+        message: err.message || 'Sunucu hatasÄ± oluÅŸtu',
         ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
     });
 });
@@ -169,30 +172,31 @@ app.use((req, res) => {
     res.status(404).sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ─── Sunucuyu Başlat ──────────────────────────────────────────────────────────
+// â”€â”€â”€ Sunucuyu BaÅŸlat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`
-╔═══════════════════════════════════════════╗
-║          APEX | Hosting Platform          ║
-╠═══════════════════════════════════════════╣
-║  Sunucu: http://localhost:${PORT}           ║
-║  Ortam : ${(process.env.NODE_ENV || 'development').padEnd(33)}║
-╚═══════════════════════════════════════════╝
+â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+â•‘          APEX | Hosting Platform          â•‘
+â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£
+â•‘  Sunucu: http://localhost:${PORT}           â•‘
+â•‘  Ortam : ${(process.env.NODE_ENV || 'development').padEnd(33)}â•‘
+â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     `);
 });
 
-// Kapanış sinyallerini yakala - tüm süreçleri temiz kapat
+// KapanÄ±ÅŸ sinyallerini yakala - tÃ¼m sÃ¼reÃ§leri temiz kapat
 process.on('SIGTERM', () => {
-    console.log('[APEX] SIGTERM alındı, kapatılıyor...');
+    console.log('[APEX] SIGTERM alÄ±ndÄ±, kapatÄ±lÄ±yor...');
     processManager.stopAll();
     server.close(() => process.exit(0));
 });
 
 process.on('SIGINT', () => {
-    console.log('[APEX] SIGINT alındı, kapatılıyor...');
+    console.log('[APEX] SIGINT alÄ±ndÄ±, kapatÄ±lÄ±yor...');
     processManager.stopAll();
     server.close(() => process.exit(0));
 });
 
 module.exports = { app, server };
+

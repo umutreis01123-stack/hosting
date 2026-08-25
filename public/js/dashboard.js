@@ -42,6 +42,9 @@ async function checkAuth() {
         currentUser = data.user;
         document.getElementById('user-name').textContent = currentUser.username;
         document.getElementById('user-avatar').src = currentUser.avatar;
+        // Kredi gostergesini guncelle
+        var creditsEl = document.getElementById('user-credits');
+        if (creditsEl) creditsEl.innerHTML = '<i class="fa-solid fa-coins"></i> ' + (data.credits || 0) + ' Kredi';
         const urlParams = new URLSearchParams(window.location.search);
         if (data.ownerPending || urlParams.get('ownerLogin') === '1') {
             ownerModal.style.display = 'flex';
@@ -126,6 +129,7 @@ async function openProject(id, name, running) {
     loadFiles(id);
     connectWebSocket(id);
     fetchStatus();
+    loadDnsRecords();
 }
 
 function updateStatusUI(running) {
@@ -296,39 +300,46 @@ if (uploadForm) {
     });
 }
 
-// AI Destek
-const aiResponses = [
-    { keywords: ['bot', 'baslamiyor', 'baslatamiyorum', 'calismiyor', 'start'], answer: 'Botunuz baslamiyorsa:\n1. Proje detayina girip "Baslat" butonuna tiklayin.\n2. Canli konsolda hata mesaji var mi bakin.\n3. node_modules klasorunu zipin disinda birakin.' },
-    { keywords: ['zip', 'yukleme', 'yuklenemedi', 'upload', 'dosya'], answer: 'Zip yukleme sorunlari icin:\n1. Zip max 50MB olmali.\n2. Zip dogrudan proje dosyalarini icermeli.\n3. Zip icinde package.json var mi kontrol edin.' },
-    { keywords: ['token', 'env', 'degisken', 'gizli', 'secret'], answer: 'Gizli anahtarlarinizi eklemek icin:\n1. Proje detay ekranina gidin.\n2. Dosya yoneticisinde .env dosyasi olusturun.\n3. Icine TOKEN=sizin_tokeniniz yazip kaydedin.' },
-    { keywords: ['kapaniyor', 'duruyor', 'crash', 'stopped'], answer: 'Bot surekli kapaniyorsa:\n1. Konsol ekranindaki hata mesajini okuyun.\n2. node_modules olmadan zip yukleyin.\n3. Kodunuzda islenmemis hata (unhandledRejection) olabilir.' },
-    { keywords: ['nasil', 'yardim', 'merhaba', 'selam', 'ne'], answer: 'Merhaba! Bot baslat/durdurma, zip yukleme, token/ENV ekleme ve konsol hatalari konularinda yardimci olabilirim. Sorunuzu detayli yazin!' }
-];
-
+// AI Destek - Backend Gemini API
 function sendAIMessage() {
-    const input = document.getElementById('ai-chat-input');
-    const message = input.value.trim();
+    var input = document.getElementById('ai-chat-input');
+    var message = input.value.trim();
     if (!message) return;
     appendChatMessage(message, 'user');
     input.value = '';
-    setTimeout(() => {
-        const lower = message.toLowerCase();
-        const found = aiResponses.find(r => r.keywords.some(k => lower.includes(k)));
-        if (found) { appendChatMessage(found.answer, 'ai'); }
-        else { appendChatMessage('Uzgunum, bu konuda yardimci olamiyorum. Discord sunucumuzdan canli destek alabilirsiniz.\n\n<a href="https://discord.gg/3pRqYchFRV" target="_blank" style="color:#7289da;font-weight:bold;">Discord\'da Canli Destek Ac</a>', 'ai'); }
-    }, 600);
+    
+    // Dusunuyor mesaji
+    appendChatMessage('<i class="fa-solid fa-spinner fa-spin"></i> Dusunuyor...', 'ai');
+    
+    fetch('/api/support', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: message })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        // "Dusunuyor" mesajini kaldir
+        var chatBox = document.getElementById('ai-chat-box');
+        if (chatBox && chatBox.lastChild) chatBox.removeChild(chatBox.lastChild);
+        appendChatMessage(data.reply || 'Yanit alinamadi.', 'ai');
+    })
+    .catch(function() {
+        var chatBox = document.getElementById('ai-chat-box');
+        if (chatBox && chatBox.lastChild) chatBox.removeChild(chatBox.lastChild);
+        appendChatMessage('Sunucuya ulasilamadi. Lutfen tekrar deneyin.', 'ai');
+    });
 }
 
 function appendChatMessage(text, type) {
     try {
-        const chatBox = document.getElementById('ai-chat-box');
+        var chatBox = document.getElementById('ai-chat-box');
         if (!chatBox) return;
-        const msg = document.createElement('div');
+        var msg = document.createElement('div');
         msg.className = 'chat-message ' + (type === 'ai' ? 'ai-message' : 'user-message');
-        const avatar = document.createElement('div');
+        var avatar = document.createElement('div');
         avatar.className = 'avatar';
         avatar.innerHTML = type === 'ai' ? '<i class="fa-solid fa-robot"></i>' : '<i class="fa-solid fa-user"></i>';
-        const bubble = document.createElement('div');
+        var bubble = document.createElement('div');
         bubble.className = 'bubble';
         bubble.innerHTML = String(text).replace(/\n/g, '<br>');
         msg.appendChild(avatar);
@@ -338,4 +349,83 @@ function appendChatMessage(text, type) {
     } catch(e) { console.error('Chat error', e); }
 }
 
+
+
+
+
+
+// ==============================
+// V2 Guncellemeleri - Bot Durumu
+// ==============================
+function saveBotStatus() {
+    if (!currentProject) return;
+    const type = document.getElementById('bot-status-type').value;
+    const text = document.getElementById('bot-status-text').value;
+    
+    if (!text) {
+        document.getElementById('bot-status-msg').innerText = 'Lutfen durum metni girin.';
+        return;
+    }
+    
+    fetch('/api/projects/' + currentProject + '/status-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: type, text: text })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('bot-status-msg').innerText = data.message;
+        document.getElementById('bot-status-msg').style.color = data.success ? 'var(--success)' : 'var(--error)';
+        if(data.success) { setTimeout(() => document.getElementById('bot-status-msg').innerText='', 3000); }
+    });
+}
+
+// ==============================
+// V2 Guncellemeleri - DNS Yonetimi
+// ==============================
+function loadDnsRecords() {
+    if (!currentProject) return;
+    const list = document.getElementById('dns-records-list');
+    list.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Yukleniyor...';
+    
+    fetch('/api/projects/' + currentProject + '/dns')
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success || !data.records || data.records.length === 0) {
+            list.innerHTML = 'Kayit yok';
+            return;
+        }
+        list.innerHTML = data.records.map(r => 
+            '<div style="background:var(--bg);padding:0.4rem;border-radius:4px;margin-bottom:0.4rem;display:flex;justify-content:space-between;">' +
+            '<span><strong style="color:var(--primary)">' + r.type + '</strong> ' + r.name + '</span>' +
+            '<span style="color:var(--text);">' + r.value + '</span>' +
+            '</div>'
+        ).join('');
+    });
+}
+
+function addDnsRecord() {
+    if (!currentProject) return;
+    const type = document.getElementById('dns-type').value;
+    const name = document.getElementById('dns-name').value;
+    const value = document.getElementById('dns-value').value;
+    
+    if (!name || !value) return alert('Ad ve deger zorunludur.');
+    
+    fetch('/api/projects/' + currentProject + '/dns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: type, name: name, value: value })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('dns-name').value = '';
+            document.getElementById('dns-value').value = '';
+            loadDnsRecords(); // listeyi yenile
+        } else {
+            alert(data.message);
+        }
+    });
+}
 

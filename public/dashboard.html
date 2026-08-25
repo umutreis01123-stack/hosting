@@ -43,7 +43,7 @@
             <div class="user-profile">
                 <img id="user-avatar" src="" alt="Avatar">
                 <div class="user-info">
-                    <span id="user-name">Kullanıcı Adı</span>
+                    <span id="user-name">Kullanıcı Adı</span><br><span id="user-credits" style="font-size:0.8rem;color:#ffb86c;"><i class="fa-solid fa-coins"></i> 0 Kredi</span>
                     <a href="/auth/logout"><i class="fa-solid fa-right-from-bracket"></i> Çıkış</a>
                 </div>
             </div>
@@ -140,6 +140,41 @@
                     <button class="btn-action danger ml-auto" onclick="deleteProject()"><i class="fa-solid fa-trash"></i> Projeyi Sil</button>
                 </div>
 
+                <!-- Bot Durumu & DNS Ayarlari -->
+                <div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap;">
+                    <!-- Bot Durumu -->
+                    <div style="flex:1;min-width:280px;background:var(--secondary);border:1px solid var(--border);border-radius:8px;padding:1rem;">
+                        <div class="panel-header"><i class="fa-solid fa-gamepad"></i> Bot Durumu</div>
+                        <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+                            <select id="bot-status-type" style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.5rem;border-radius:4px;">
+                                <option value="Playing">Oynuyor</option>
+                                <option value="Watching">Izliyor</option>
+                                <option value="Listening">Dinliyor</option>
+                                <option value="Streaming">Yayinda</option>
+                            </select>
+                            <input type="text" id="bot-status-text" placeholder="Durum metni..." style="flex:2;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.5rem;border-radius:4px;">
+                        </div>
+                        <button class="btn-small success" style="margin-top:0.5rem;width:100%;" onclick="saveBotStatus()"><i class="fa-solid fa-floppy-disk"></i> Durumu Kaydet</button>
+                        <div id="bot-status-msg" style="font-size:0.8rem;color:var(--text-muted);margin-top:0.5rem;"></div>
+                    </div>
+
+                    <!-- DNS Yonetimi -->
+                    <div style="flex:1;min-width:280px;background:var(--secondary);border:1px solid var(--border);border-radius:8px;padding:1rem;">
+                        <div class="panel-header"><i class="fa-solid fa-globe"></i> DNS Kayitlari</div>
+                        <div id="dns-records-list" style="max-height:120px;overflow-y:auto;margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted);">Kayit yok</div>
+                        <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+                            <select id="dns-type" style="width:80px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.4rem;border-radius:4px;font-size:0.85rem;">
+                                <option value="A">A</option>
+                                <option value="CNAME">CNAME</option>
+                                <option value="TXT">TXT</option>
+                            </select>
+                            <input type="text" id="dns-name" placeholder="Ad (@ veya sub)" style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.4rem;border-radius:4px;font-size:0.85rem;">
+                            <input type="text" id="dns-value" placeholder="Deger" style="flex:2;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.4rem;border-radius:4px;font-size:0.85rem;">
+                            <button class="btn-small" onclick="addDnsRecord()" style="font-size:0.85rem;"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="workspace">
                     <!-- Dosya Yöneticisi -->
                     <div class="file-explorer">
@@ -179,3 +214,4 @@
     <script src="/js/dashboard.js"></script>
 </body>
 </html>
+
