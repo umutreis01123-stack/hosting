@@ -48,13 +48,18 @@ async function checkAuth() {
         document.getElementById('user-name').textContent = currentUser.username;
         document.getElementById('user-avatar').src = currentUser.avatar;
 
-        // Owner kontrolÃ¼ - Modal gÃ¶ster
+        // Owner kontrolÃ¼ - Modal gÃ¶ster veya sidebar linkini aÃ§
         const urlParams = new URLSearchParams(window.location.search);
         if (data.ownerPending || urlParams.get('ownerLogin') === '1') {
             ownerModal.style.display = 'flex';
         } else {
             appLayout.style.display = 'flex';
             loadProjects();
+            // EÄŸer owner ise sidebar'daki Kurucu Paneli butonunu gÃ¶ster
+            if (data.isOwner) {
+                const ownerNavLink = document.getElementById('nav-owner-link');
+                if (ownerNavLink) ownerNavLink.style.display = 'flex';
+            }
         }
     } catch (err) {
         console.error('Auth check error', err);
@@ -450,3 +455,69 @@ uploadForm.addEventListener('submit', async (e) => {
         btn.innerHTML = 'YÃ¼kle ve BaÅŸlat <i class="fa-solid fa-rocket"></i>';
     }
 });
+
+// =============================================
+// APEX Yapay Zeka Destek Motoru
+// =============================================
+const aiResponses = [
+    {
+        keywords: ['bot', 'baþlamýyor', 'baþlatamýyorum', 'çalýþmýyor', 'start', 'baþlat'],
+        answer: Botunuz baþlamýyorsa þunlarý kontrol edin:\n1. Proje detayýna girip "Baþlat" butonuna týklayýn.\n2. Canlý konsol ekranýnda hata mesajý var mý bakýn.\n3. <code>index.js</code> dosyasý ana dosya olarak doðru ayarlandý mý kontrol edin.\n4. <code>node_modules</code> klasörü zip'in içinde varsa silin, sistem otomatik kurar.
+    },
+    {
+        keywords: ['zip', 'yükleme', 'yüklenemedi', 'hata', 'upload', 'dosya'],
+        answer: Zip yükleme sorunlarý için:\n1. Zip dosyasýnýn boyutu çok büyük olmamalý (max 50MB).\n2. Zip doðrudan proje dosyalarýný içermeli, içinde baþka bir zip olmamalý.\n3. Zip içinde <code>package.json</code> var mý kontrol edin.
+    },
+    {
+        keywords: ['token', 'env', 'çevre', 'deðiþken', 'gizli', 'secret'],
+        answer: Gizli anahtarlarýnýzý (TOKEN, API KEY vb.) projenize þöyle ekleyebilirsiniz:\n1. Proje detay ekranýna gidin.\n2. Dosya yöneticisinde <code>.env</code> dosyasý oluþturun.\n3. Ýçine <code>TOKEN=sizin_tokeniniz</code> yazýp kaydedin.
+    },
+    {
+        keywords: ['kapanýyor', 'duruyor', 'crash', 'kilitlendi', 'stopped'],
+        answer: Bot sürekli kapanýyorsa:\n1. Konsol ekranýndaki hata mesajýný okuyun.\n2. Genellikle <code>node_modules</code> eksikliðinden kaynaklanýr. Zip'i <code>node_modules</code> olmadan yükleyin.\n3. Botunuzun kodunda iþlenmemiþ bir hata (unhandledRejection) olabilir.
+    },
+    {
+        keywords: ['nasýl', 'ne', 'ne yapayým', 'yardým', 'merhaba', 'selam'],
+        answer: Merhaba! Size þu konularda yardýmcý olabilirim:\n• **Bot baþlatma/durdurma** sorunlarý\n• **Zip yükleme** hatalarý\n• **Token/ENV** deðiþkeni ekleme\n• **Konsol hatalarý** yorumlama\n\nSorunuzu detaylý yazarsanýz daha iyi yardýmcý olabilirim!
+    }
+];
+
+const DISCORD_SUPPORT_URL = 'https://discord.gg/apexhosting'; // Deðiþtirilebilir
+
+function sendAIMessage() {
+    const input = document.getElementById('ai-chat-input');
+    const chatBox = document.getElementById('ai-chat-box');
+    const message = input.value.trim();
+    if (!message) return;
+
+    // Kullanýcý mesajý ekle
+    appendChatMessage(message, 'user');
+    input.value = '';
+
+    // Yapay Zeka yanýtýný bul
+    setTimeout(() => {
+        const lower = message.toLowerCase();
+        let found = aiResponses.find(r => r.keywords.some(k => lower.includes(k)));
+        
+        if (found) {
+            appendChatMessage(found.answer, 'ai');
+        } else {
+            appendChatMessage(
+                Üzgünüm, bu konuda size yeterince yardýmcý olamýyorum. Daha detaylý destek için Discord sunucumuzdaki canlý destek kanalýný kullanabilirsiniz.\n\n?? <a href="" target="_blank" style="color:#7289da;font-weight:bold;">Discord'da Canlý Destek Aç</a>,
+                'ai'
+            );
+        }
+    }, 600);
+}
+
+function appendChatMessage(text, type) {
+    const chatBox = document.getElementById('ai-chat-box');
+    const msg = document.createElement('div');
+    msg.className = chat-message ;
+    msg.innerHTML = 
+        <div class="avatar"></div>
+        <div class="bubble"></div>
+    ;
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}

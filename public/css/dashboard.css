@@ -286,3 +286,82 @@
 }
 .term-err { color: #bf616a; }
 .term-sys { color: #ebcb8b; }
+/* Yapay Zeka Destek Sohbet Tasarýmý */
+.support-chat-container {
+    background-color: var(--secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+    max-height: 70vh;
+}
+.chat-box {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.chat-message {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    max-width: 80%;
+}
+.chat-message .avatar {
+    width: 35px;
+    height: 35px;
+    background: var(--bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+}
+.chat-message .bubble {
+    padding: 1rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+.ai-message {
+    align-self: flex-start;
+}
+.ai-message .bubble {
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 2px;
+}
+.user-message {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+.user-message .bubble {
+    background-color: var(--primary);
+    color: white;
+    border-bottom-right-radius: 2px;
+}
+.chat-input-area {
+    display: flex;
+    padding: 1rem;
+    border-top: 1px solid var(--border);
+    gap: 10px;
+    background-color: var(--bg);
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+.chat-input-area input {
+    flex: 1;
+    background-color: var(--secondary);
+    border: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    color: var(--text);
+    font-family: inherit;
+}
+.chat-input-area input:focus {
+    outline: none;
+    border-color: var(--primary);
+}

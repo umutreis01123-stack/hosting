@@ -36,6 +36,8 @@
             <nav class="menu">
                 <a href="#" class="active" data-view="projects"><i class="fa-solid fa-server"></i> Projelerim</a>
                 <a href="#" data-view="upload"><i class="fa-solid fa-cloud-arrow-up"></i> Yeni Yükle</a>
+                <a href="#" data-view="support"><i class="fa-solid fa-robot"></i> Destek (Yapay Zeka)</a>
+                <a href="/owner" id="nav-owner-link" style="display: none; color: #ffb86c; font-weight: bold; margin-top: auto;"><i class="fa-solid fa-crown"></i> Kurucu Paneli</a>
             </nav>
 
             <div class="user-profile">
@@ -100,6 +102,25 @@
 
                         <button type="submit" class="btn-primary btn-block" id="btn-upload">Yükle ve Başlat <i class="fa-solid fa-rocket"></i></button>
                     </form>
+                </div>
+            </div>
+
+            <!-- Destek (Yapay Zeka) Görünümü -->
+            <div id="view-support" class="view">
+                <div class="header">
+                    <h1><i class="fa-solid fa-robot"></i> Destek (Yapay Zeka)</h1>
+                </div>
+                <div class="support-chat-container">
+                    <div class="chat-box" id="ai-chat-box">
+                        <div class="chat-message ai-message">
+                            <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                            <div class="bubble">Merhaba! Ben APEX Yapay Zeka asistanıyım. Hosting sistemimiz, bot kurulumları ve hatalar hakkında bana soru sorabilirsiniz. Nasıl yardımcı olabilirim?</div>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="ai-chat-input" placeholder="Sorunuzu buraya yazın..." onkeypress="if(event.key === 'Enter') sendAIMessage()">
+                        <button class="btn-primary" onclick="sendAIMessage()"><i class="fa-solid fa-paper-plane"></i> Gönder</button>
+                    </div>
                 </div>
             </div>
 
