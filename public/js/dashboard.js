@@ -1,4 +1,4 @@
-// State
+﻿// State
 let currentUser = null;
 let currentProject = null;
 let editor = null;
@@ -315,16 +315,27 @@ function sendAIMessage() {
         const lower = message.toLowerCase();
         const found = aiResponses.find(r => r.keywords.some(k => lower.includes(k)));
         if (found) { appendChatMessage(found.answer, 'ai'); }
-        else { appendChatMessage('Uzgunum, bu konuda yardimci olamiyorum. Discord sunucumuzdan canli destek alabilirsiniz.\n\n<a href="https://discord.gg/apexhosting" target="_blank" style="color:#7289da;font-weight:bold;">Discord\'da Canli Destek Ac</a>', 'ai'); }
+        else { appendChatMessage('Uzgunum, bu konuda yardimci olamiyorum. Discord sunucumuzdan canli destek alabilirsiniz.\n\n<a href="https://discord.gg/3pRqYchFRV" target="_blank" style="color:#7289da;font-weight:bold;">Discord\'da Canli Destek Ac</a>', 'ai'); }
     }, 600);
 }
 
 function appendChatMessage(text, type) {
-    const chatBox = document.getElementById('ai-chat-box');
-    if (!chatBox) return;
-    const msg = document.createElement('div');
-    msg.className = 'chat-message ' + (type === 'ai' ? 'ai-message' : 'user-message');
-    msg.innerHTML = '<div class="avatar">' + (type === 'ai' ? '<i class="fa-solid fa-robot"></i>' : '<i class="fa-solid fa-user"></i>') + '</div><div class="bubble">' + text.replace(/\n/g, '<br>') + '</div>';
-    chatBox.appendChild(msg);
-    chatBox.scrollTop = chatBox.scrollHeight;
+    try {
+        const chatBox = document.getElementById('ai-chat-box');
+        if (!chatBox) return;
+        const msg = document.createElement('div');
+        msg.className = 'chat-message ' + (type === 'ai' ? 'ai-message' : 'user-message');
+        const avatar = document.createElement('div');
+        avatar.className = 'avatar';
+        avatar.innerHTML = type === 'ai' ? '<i class="fa-solid fa-robot"></i>' : '<i class="fa-solid fa-user"></i>';
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.innerHTML = String(text).replace(/\n/g, '<br>');
+        msg.appendChild(avatar);
+        msg.appendChild(bubble);
+        chatBox.appendChild(msg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    } catch(e) { console.error('Chat error', e); }
 }
+
+
