@@ -1,11 +1,4 @@
-/**
- * ============================================
- * APEX | Hosting — Discord OAuth2 Auth Routes
- * GET /auth/discord          → OAuth2 başlat
- * GET /auth/discord/callback → OAuth2 callback
- * GET /auth/logout           → Çıkış
- * GET /auth/me               → Oturum bilgisi
- * ===================================const express = require('express');
+const express = require('express');
 const fs = require('fs');
 const bcrypt = require('bcrypt');
 const svgCaptcha = require('svg-captcha');
@@ -43,6 +36,7 @@ router.post('/register', async (req, res) => {
     const users = getUsers();
     const usernameExists = Object.values(users).some(u => u.username.toLowerCase() === username.toLowerCase());
     if (usernameExists) return res.status(400).json({ success: false, message: 'Bu kullanıcı adı zaten alınmış.' });
+    
     const discordIdExists = Object.values(users).some(u => u.discordId === discordId);
     if (discordIdExists) return res.status(400).json({ success: false, message: 'Bu Discord ID zaten kayıtlı.' });
     
@@ -84,7 +78,6 @@ router.post('/login', async (req, res) => {
         req.session.user = { id: user.id, discordId: user.discordId, username: user.username, avatar: user.avatar, loggedInAt: new Date().toISOString() };
         req.session.captcha = null;
         
-        // Eğer kurucuysa owner flagini ayarla (Discord ID'den kontrol et)
         const ownerDiscordId = process.env.OWNER_DISCORD_ID || '1403495996138323989';
         if (user.discordId === ownerDiscordId) {
             req.session.isOwner = false;
