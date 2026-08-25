@@ -1,4 +1,4 @@
-// State
+﻿// State
 let currentUser = null;
 let currentProject = null;
 let editor = null;
@@ -9,12 +9,12 @@ let currentFilePath = null;
 const appLayout = document.getElementById('app-layout');
 const ownerModal = document.getElementById('owner-modal');
 const views = document.querySelectorAll('.view');
-const menuLinks = document.querySelectorAll('.menu a');
+const menuLinks = document.querySelectorAll('.menu a[data-view]');
 const terminal = document.getElementById('terminal-output');
 
 // Init CodeMirror
 document.addEventListener('DOMContentLoaded', () => {
-    editor = CodeMirror.fromTextArea(document.getElementById("code-editor"), {
+    const codeEditorEl = document.getElementById('code-editor'); if (codeEditorEl) editor = CodeMirror.fromTextArea(codeEditorEl, {
         lineNumbers: true,
         theme: "monokai",
         mode: "javascript",
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     editor.setSize("100%", "100%");
 
-    // Editörde değişiklik olduğunda kaydet butonunu aktif et
+    // EditÃ¶rde deÄŸiÅŸiklik olduÄŸunda kaydet butonunu aktif et
     editor.on("change", () => {
         if (currentFilePath) {
             document.getElementById('btn-save-file').disabled = false;
@@ -48,14 +48,14 @@ async function checkAuth() {
         document.getElementById('user-name').textContent = currentUser.username;
         document.getElementById('user-avatar').src = currentUser.avatar;
 
-        // Owner kontrolü - Modal göster veya sidebar linkini aç
+        // Owner kontrolÃ¼ - Modal gÃ¶ster veya sidebar linkini aÃ§
         const urlParams = new URLSearchParams(window.location.search);
         if (data.ownerPending || urlParams.get('ownerLogin') === '1') {
             ownerModal.style.display = 'flex';
         } else {
             appLayout.style.display = 'flex';
             loadProjects();
-            // Eğer owner ise sidebar'daki Kurucu Paneli butonunu göster
+            // EÄŸer owner ise sidebar'daki Kurucu Paneli butonunu gÃ¶ster
             if (data.isOwner) {
                 const ownerNavLink = document.getElementById('nav-owner-link');
                 if (ownerNavLink) ownerNavLink.style.display = 'flex';
@@ -85,7 +85,7 @@ document.getElementById('btn-owner-verify')?.addEventListener('click', async () 
             errorDiv.textContent = data.message;
         }
     } catch (err) {
-        errorDiv.textContent = 'Bağlantı hatası.';
+        errorDiv.textContent = 'BaÄŸlantÄ± hatasÄ±.';
     }
 });
 
@@ -112,7 +112,7 @@ menuLinks.forEach(link => {
     });
 });
 
-// ─── Projeler ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Projeler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function loadProjects() {
     try {
@@ -124,9 +124,9 @@ async function loadProjects() {
             list.innerHTML = `
                 <div style="grid-column: 1/-1; text-align:center; padding: 3rem; background: var(--bg-card); border-radius:10px;">
                     <i class="fa-solid fa-folder-open" style="font-size: 3rem; color:var(--text-muted); margin-bottom:1rem;"></i>
-                    <h3>Henüz projeniz yok</h3>
-                    <p style="color:var(--text-muted); margin-bottom:1rem;">Hemen bir .zip yükleyerek botunuzu veya sitenizi başlatın.</p>
-                    <button class="btn-primary" onclick="switchView('upload')">Yeni Yükle</button>
+                    <h3>HenÃ¼z projeniz yok</h3>
+                    <p style="color:var(--text-muted); margin-bottom:1rem;">Hemen bir .zip yÃ¼kleyerek botunuzu veya sitenizi baÅŸlatÄ±n.</p>
+                    <button class="btn-primary" onclick="switchView('upload')">Yeni YÃ¼kle</button>
                 </div>
             `;
             return;
@@ -140,7 +140,7 @@ async function loadProjects() {
                         <span class="project-type">${p.type === 'bot' ? 'Discord Bot' : 'Web Sitesi'}</span>
                     </div>
                     <span class="status-badge ${p.running ? 'status-running' : 'status-stopped'}">
-                        ${p.running ? 'Çalışıyor' : 'Durduruldu'}
+                        ${p.running ? 'Ã‡alÄ±ÅŸÄ±yor' : 'Durduruldu'}
                     </span>
                 </div>
                 <div style="font-size: 0.85rem; color:var(--text-muted);">
@@ -149,7 +149,7 @@ async function loadProjects() {
             </div>
         `).join('');
     } catch (err) {
-        document.getElementById('projects-list').innerHTML = '<div class="alert error">Projeler yüklenirken hata oluştu.</div>';
+        document.getElementById('projects-list').innerHTML = '<div class="alert error">Projeler yÃ¼klenirken hata oluÅŸtu.</div>';
     }
 }
 
@@ -161,7 +161,7 @@ function formatUptime(ms) {
     return `${h > 0 ? h+'s ' : ''}${m > 0 ? m+'d ' : ''}${s%60}sn`;
 }
 
-// ─── Proje Detay & Terminal ───────────────────────────────────────────────
+// â”€â”€â”€ Proje Detay & Terminal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function openProject(id, name, running) {
     currentProject = id;
@@ -169,19 +169,19 @@ async function openProject(id, name, running) {
     updateStatusUI(running);
     switchView('project-detail');
     
-    // Klasör ağacını yükle
+    // KlasÃ¶r aÄŸacÄ±nÄ± yÃ¼kle
     loadFiles(id);
     
-    // WebSocket bağlan
+    // WebSocket baÄŸlan
     connectWebSocket(id);
 
-    // Güncel status çek
+    // GÃ¼ncel status Ã§ek
     fetchStatus();
 }
 
 function updateStatusUI(running) {
     const badge = document.getElementById('detail-status');
-    badge.textContent = running ? 'Çalışıyor' : 'Durduruldu';
+    badge.textContent = running ? 'Ã‡alÄ±ÅŸÄ±yor' : 'Durduruldu';
     badge.className = `status-badge ${running ? 'status-running' : 'status-stopped'}`;
     
     document.getElementById('btn-start').disabled = running;
@@ -196,13 +196,13 @@ async function projectAction(action) {
         const data = await res.json();
         
         if (data.success) {
-            terminal.innerHTML += `<div class="term-sys">[SİSTEM] ${data.message}</div>`;
+            terminal.innerHTML += `<div class="term-sys">[SÄ°STEM] ${data.message}</div>`;
             fetchStatus();
         } else {
             alert(data.message);
         }
     } catch(err) {
-        alert('İşlem başarısız');
+        alert('Ä°ÅŸlem baÅŸarÄ±sÄ±z');
     }
 }
 
@@ -217,7 +217,7 @@ async function fetchStatus() {
 }
 
 async function deleteProject() {
-    if(!confirm("Bu projeyi tamamen silmek istediğinize emin misiniz? (Geri alınamaz)")) return;
+    if(!confirm("Bu projeyi tamamen silmek istediÄŸinize emin misiniz? (Geri alÄ±namaz)")) return;
     try {
         const res = await fetch(`/api/projects/${currentProject}`, { method: 'DELETE' });
         const data = await res.json();
@@ -243,7 +243,7 @@ function connectWebSocket(projectId) {
             const div = document.createElement('div');
             let text = data.line;
             
-            // Renklendirme basitçe
+            // Renklendirme basitÃ§e
             if(text.includes('[ERROR]') || text.includes('[STDERR]')) div.className = 'term-err';
             else if(text.includes('[SYSTEM]')) div.className = 'term-sys';
             
@@ -253,18 +253,18 @@ function connectWebSocket(projectId) {
         }
     };
     
-    ws.onclose = () => console.log('WS Kapandı');
+    ws.onclose = () => console.log('WS KapandÄ±');
 }
 
 function clearTerminal() {
     terminal.innerHTML = '';
 }
 
-// ─── Dosya Yöneticisi & Editör ──────────────────────────────────────────
+// â”€â”€â”€ Dosya YÃ¶neticisi & EditÃ¶r â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function loadFiles(projectId) {
     const tree = document.getElementById('file-tree');
-    tree.innerHTML = 'Yükleniyor...';
+    tree.innerHTML = 'YÃ¼kleniyor...';
     try {
         const res = await fetch(`/api/editor/${projectId}/files`);
         const data = await res.json();
@@ -273,7 +273,7 @@ async function loadFiles(projectId) {
             bindTreeEvents();
         }
     } catch(err) {
-        tree.innerHTML = 'Dosyalar yüklenemedi.';
+        tree.innerHTML = 'Dosyalar yÃ¼klenemedi.';
     }
 }
 
@@ -320,16 +320,16 @@ function bindTreeEvents() {
 }
 
 async function openFile(filePath, fileName, ext) {
-    // Kötü uzantıları engelle
+    // KÃ¶tÃ¼ uzantÄ±larÄ± engelle
     if(['zip','jpg','png','sqlite','db'].includes(ext)) {
-        alert('Bu dosya tipi düzenlenemez.');
+        alert('Bu dosya tipi dÃ¼zenlenemez.');
         return;
     }
 
     document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('active'));
     event.currentTarget.classList.add('active');
 
-    document.getElementById('current-file-name').textContent = 'Yükleniyor...';
+    document.getElementById('current-file-name').textContent = 'YÃ¼kleniyor...';
     
     try {
         const res = await fetch(`/api/editor/${currentProject}/file?filePath=${encodeURIComponent(filePath)}`);
@@ -346,12 +346,12 @@ async function openFile(filePath, fileName, ext) {
             else editor.setOption("mode", "javascript");
             
             editor.setValue(data.content);
-            document.getElementById('btn-save-file').disabled = true; // Değişiklik yok
+            document.getElementById('btn-save-file').disabled = true; // DeÄŸiÅŸiklik yok
         } else {
             alert(data.message);
         }
     } catch(err) {
-        alert('Dosya açılamadı.');
+        alert('Dosya aÃ§Ä±lamadÄ±.');
     }
 }
 
@@ -380,7 +380,7 @@ document.getElementById('btn-save-file').addEventListener('click', async () => {
                 btn.classList.replace('primary', 'success');
             }, 2000);
             
-            // Proje yeniden başlıyor, status'u güncelle
+            // Proje yeniden baÅŸlÄ±yor, status'u gÃ¼ncelle
             fetchStatus();
         } else {
             alert(data.message);
@@ -392,7 +392,7 @@ document.getElementById('btn-save-file').addEventListener('click', async () => {
     }
 });
 
-// ─── Yeni Yükle (Upload) ──────────────────────────────────────────────────
+// â”€â”€â”€ Yeni YÃ¼kle (Upload) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const uploadForm = document.getElementById('upload-form');
 const upFile = document.getElementById('up-file');
@@ -401,7 +401,7 @@ const fileDisplay = document.getElementById('file-name-display');
 
 upFile.addEventListener('change', (e) => {
     if(e.target.files.length > 0) {
-        fileDisplay.innerHTML = `<i class="fa-solid fa-file-zipper"></i> ${e.target.files[0].name} seçildi.`;
+        fileDisplay.innerHTML = `<i class="fa-solid fa-file-zipper"></i> ${e.target.files[0].name} seÃ§ildi.`;
         fileDrop.style.borderColor = 'var(--success)';
     }
 });
@@ -410,7 +410,7 @@ uploadForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const file = upFile.files[0];
-    if(!file) return alert('Lütfen bir zip dosyası seçin.');
+    if(!file) return alert('LÃ¼tfen bir zip dosyasÄ± seÃ§in.');
     
     const formData = new FormData();
     formData.append('projectFile', file);
@@ -422,10 +422,10 @@ uploadForm.addEventListener('submit', async (e) => {
     const btn = document.getElementById('btn-upload');
     
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Yükleniyor ve Başlatılıyor...';
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> YÃ¼kleniyor ve BaÅŸlatÄ±lÄ±yor...';
     statusDiv.style.display = 'block';
     statusDiv.className = 'alert';
-    statusDiv.textContent = 'Lütfen bekleyin, zip çıkartılıyor ve bağımlılıklar kuruluyor...';
+    statusDiv.textContent = 'LÃ¼tfen bekleyin, zip Ã§Ä±kartÄ±lÄ±yor ve baÄŸÄ±mlÄ±lÄ±klar kuruluyor...';
 
     try {
         const res = await fetch('/api/upload', { method: 'POST', body: formData });
@@ -438,7 +438,7 @@ uploadForm.addEventListener('submit', async (e) => {
             fileDisplay.innerHTML = '';
             fileDrop.style.borderColor = 'var(--border)';
             
-            // Başarılı olunca o projenin paneline git
+            // BaÅŸarÄ±lÄ± olunca o projenin paneline git
             setTimeout(() => {
                 openProject(data.projectId, formData.get('projectName'), true);
             }, 1500);
@@ -446,13 +446,13 @@ uploadForm.addEventListener('submit', async (e) => {
             statusDiv.className = 'alert error';
             statusDiv.textContent = data.message;
             btn.disabled = false;
-            btn.innerHTML = 'Yükle ve Başlat <i class="fa-solid fa-rocket"></i>';
+            btn.innerHTML = 'YÃ¼kle ve BaÅŸlat <i class="fa-solid fa-rocket"></i>';
         }
     } catch(err) {
         statusDiv.className = 'alert error';
-        statusDiv.textContent = 'Bir hata oluştu, tekrar deneyin.';
+        statusDiv.textContent = 'Bir hata oluÅŸtu, tekrar deneyin.';
         btn.disabled = false;
-        btn.innerHTML = 'Yükle ve Başlat <i class="fa-solid fa-rocket"></i>';
+        btn.innerHTML = 'YÃ¼kle ve BaÅŸlat <i class="fa-solid fa-rocket"></i>';
     }
 });
 
@@ -461,28 +461,28 @@ uploadForm.addEventListener('submit', async (e) => {
 // =============================================
 const aiResponses = [
     {
-        keywords: ['bot', 'ba�lam�yor', 'ba�latam�yorum', '�al��m�yor', 'start', 'ba�lat'],
-        answer: Botunuz ba�lam�yorsa �unlar� kontrol edin:\n1. Proje detay�na girip "Ba�lat" butonuna t�klay�n.\n2. Canl� konsol ekran�nda hata mesaj� var m� bak�n.\n3. <code>index.js</code> dosyas� ana dosya olarak do�ru ayarland� m� kontrol edin.\n4. <code>node_modules</code> klas�r� zip'in i�inde varsa silin, sistem otomatik kurar.
+        keywords: ['bot', 'başlamıyor', 'başlatamıyorum', 'çalışmıyor', 'start', 'başlat'],
+        answer: Botunuz başlamıyorsa şunları kontrol edin:\n1. Proje detayına girip "Başlat" butonuna tıklayın.\n2. Canlı konsol ekranında hata mesajı var mı bakın.\n3. <code>index.js</code> dosyası ana dosya olarak doğru ayarlandı mı kontrol edin.\n4. <code>node_modules</code> klasörü zip'in içinde varsa silin, sistem otomatik kurar.
     },
     {
-        keywords: ['zip', 'y�kleme', 'y�klenemedi', 'hata', 'upload', 'dosya'],
-        answer: Zip y�kleme sorunlar� i�in:\n1. Zip dosyas�n�n boyutu �ok b�y�k olmamal� (max 50MB).\n2. Zip do�rudan proje dosyalar�n� i�ermeli, i�inde ba�ka bir zip olmamal�.\n3. Zip i�inde <code>package.json</code> var m� kontrol edin.
+        keywords: ['zip', 'yükleme', 'yüklenemedi', 'hata', 'upload', 'dosya'],
+        answer: Zip yükleme sorunları için:\n1. Zip dosyasının boyutu çok büyük olmamalı (max 50MB).\n2. Zip doğrudan proje dosyalarını içermeli, içinde başka bir zip olmamalı.\n3. Zip içinde <code>package.json</code> var mı kontrol edin.
     },
     {
-        keywords: ['token', 'env', '�evre', 'de�i�ken', 'gizli', 'secret'],
-        answer: Gizli anahtarlar�n�z� (TOKEN, API KEY vb.) projenize ��yle ekleyebilirsiniz:\n1. Proje detay ekran�na gidin.\n2. Dosya y�neticisinde <code>.env</code> dosyas� olu�turun.\n3. ��ine <code>TOKEN=sizin_tokeniniz</code> yaz�p kaydedin.
+        keywords: ['token', 'env', 'çevre', 'değişken', 'gizli', 'secret'],
+        answer: Gizli anahtarlarınızı (TOKEN, API KEY vb.) projenize şöyle ekleyebilirsiniz:\n1. Proje detay ekranına gidin.\n2. Dosya yöneticisinde <code>.env</code> dosyası oluşturun.\n3. İçine <code>TOKEN=sizin_tokeniniz</code> yazıp kaydedin.
     },
     {
-        keywords: ['kapan�yor', 'duruyor', 'crash', 'kilitlendi', 'stopped'],
-        answer: Bot s�rekli kapan�yorsa:\n1. Konsol ekran�ndaki hata mesaj�n� okuyun.\n2. Genellikle <code>node_modules</code> eksikli�inden kaynaklan�r. Zip'i <code>node_modules</code> olmadan y�kleyin.\n3. Botunuzun kodunda i�lenmemi� bir hata (unhandledRejection) olabilir.
+        keywords: ['kapanıyor', 'duruyor', 'crash', 'kilitlendi', 'stopped'],
+        answer: Bot sürekli kapanıyorsa:\n1. Konsol ekranındaki hata mesajını okuyun.\n2. Genellikle <code>node_modules</code> eksikliğinden kaynaklanır. Zip'i <code>node_modules</code> olmadan yükleyin.\n3. Botunuzun kodunda işlenmemiş bir hata (unhandledRejection) olabilir.
     },
     {
-        keywords: ['nas�l', 'ne', 'ne yapay�m', 'yard�m', 'merhaba', 'selam'],
-        answer: Merhaba! Size �u konularda yard�mc� olabilirim:\n� **Bot ba�latma/durdurma** sorunlar�\n� **Zip y�kleme** hatalar�\n� **Token/ENV** de�i�keni ekleme\n� **Konsol hatalar�** yorumlama\n\nSorunuzu detayl� yazarsan�z daha iyi yard�mc� olabilirim!
+        keywords: ['nasıl', 'ne', 'ne yapayım', 'yardım', 'merhaba', 'selam'],
+        answer: Merhaba! Size şu konularda yardımcı olabilirim:\n• **Bot başlatma/durdurma** sorunları\n• **Zip yükleme** hataları\n• **Token/ENV** değişkeni ekleme\n• **Konsol hataları** yorumlama\n\nSorunuzu detaylı yazarsanız daha iyi yardımcı olabilirim!
     }
 ];
 
-const DISCORD_SUPPORT_URL = 'https://discord.gg/apexhosting'; // De�i�tirilebilir
+const DISCORD_SUPPORT_URL = 'https://discord.gg/apexhosting'; // Değiştirilebilir
 
 function sendAIMessage() {
     const input = document.getElementById('ai-chat-input');
@@ -490,11 +490,11 @@ function sendAIMessage() {
     const message = input.value.trim();
     if (!message) return;
 
-    // Kullan�c� mesaj� ekle
+    // Kullanıcı mesajı ekle
     appendChatMessage(message, 'user');
     input.value = '';
 
-    // Yapay Zeka yan�t�n� bul
+    // Yapay Zeka yanıtını bul
     setTimeout(() => {
         const lower = message.toLowerCase();
         let found = aiResponses.find(r => r.keywords.some(k => lower.includes(k)));
@@ -503,7 +503,7 @@ function sendAIMessage() {
             appendChatMessage(found.answer, 'ai');
         } else {
             appendChatMessage(
-                �zg�n�m, bu konuda size yeterince yard�mc� olam�yorum. Daha detayl� destek i�in Discord sunucumuzdaki canl� destek kanal�n� kullanabilirsiniz.\n\n?? <a href="" target="_blank" style="color:#7289da;font-weight:bold;">Discord'da Canl� Destek A�</a>,
+                Üzgünüm, bu konuda size yeterince yardımcı olamıyorum. Daha detaylı destek için Discord sunucumuzdaki canlı destek kanalını kullanabilirsiniz.\n\n?? <a href="" target="_blank" style="color:#7289da;font-weight:bold;">Discord'da Canlı Destek Aç</a>,
                 'ai'
             );
         }
@@ -521,3 +521,5 @@ function appendChatMessage(text, type) {
     chatBox.appendChild(msg);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
+
+
