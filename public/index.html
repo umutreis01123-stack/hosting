@@ -21,9 +21,42 @@
 
         <div id="error-message" class="error-msg" style="display: none;"></div>
 
-        <a href="/auth/discord" class="btn-discord">
-            <i class="fa-brands fa-discord"></i> Discord ile Giriş Yap
-        </a>
+        <div class="auth-box">
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchTab('login')">Giriş Yap</button>
+                <button class="auth-tab" onclick="switchTab('register')">Kayıt Ol</button>
+            </div>
+            
+            <!-- Giriş Formu -->
+            <form id="loginForm" class="auth-form active" onsubmit="handleAuth(event, 'login')">
+                <div class="form-group">
+                    <input type="text" id="loginUsername" placeholder="Kullanıcı Adı" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" placeholder="Şifre" required>
+                </div>
+                <div class="captcha-group">
+                    <img src="/auth/captcha" id="loginCaptchaImg" onclick="refreshCaptcha('login')" title="Yenilemek için tıklayın">
+                    <input type="text" id="loginCaptcha" placeholder="Kodu Girin" required autocomplete="off">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Giriş Yap <i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+
+            <!-- Kayıt Formu -->
+            <form id="registerForm" class="auth-form" style="display: none;" onsubmit="handleAuth(event, 'register')">
+                <div class="form-group">
+                    <input type="text" id="registerUsername" placeholder="Kullanıcı Adı" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="registerPassword" placeholder="Şifre" required>
+                </div>
+                <div class="captcha-group">
+                    <img src="/auth/captcha" id="registerCaptchaImg" onclick="refreshCaptcha('register')" title="Yenilemek için tıklayın">
+                    <input type="text" id="registerCaptcha" placeholder="Kodu Girin" required autocomplete="off">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Kayıt Ol <i class="fa-solid fa-user-plus"></i></button>
+            </form>
+        </div>
 
         <div class="features">
             <div class="feature">
@@ -34,7 +67,7 @@
             <div class="feature">
                 <i class="fa-solid fa-code"></i>
                 <h3>Canlı Editör</h3>
-                <p>Web üzerinden kodunu düzenle, kaydet ve Auto-Restart ile anında yenilensin</p>
+                <p>Web üzerinden kodunu düzenle, kaydet ve anında yenilensin</p>
             </div>
             <div class="feature">
                 <i class="fa-solid fa-terminal"></i>
@@ -45,28 +78,77 @@
     </div>
 
     <script>
-        // URL'den hata mesajlarını al
+        // Tab Değiştirme
+        function switchTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.style.display = 'none');
+            
+            if (tab === 'login') {
+                document.querySelectorAll('.auth-tab')[0].classList.add('active');
+                document.getElementById('loginForm').style.display = 'block';
+            } else {
+                document.querySelectorAll('.auth-tab')[1].classList.add('active');
+                document.getElementById('registerForm').style.display = 'block';
+            }
+            refreshCaptcha(tab);
+        }
+
+        // Captcha Yenileme
+        function refreshCaptcha(type) {
+            document.getElementById(`${type}CaptchaImg`).src = `/auth/captcha?v=${new Date().getTime()}`;
+            document.getElementById(`${type}Captcha`).value = '';
+        }
+
+        // Giriş ve Kayıt İşlemi
+        async function handleAuth(e, type) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Lütfen Bekleyin...';
+            btn.disabled = true;
+
+            const username = document.getElementById(`${type}Username`).value;
+            const password = document.getElementById(`${type}Password`).value;
+            const captcha = document.getElementById(`${type}Captcha`).value;
+
+            try {
+                const res = await fetch(`/auth/${type}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, captcha })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    window.location.href = data.isOwner ? '/dashboard?ownerLogin=1' : '/dashboard';
+                } else {
+                    alert(data.message);
+                    refreshCaptcha(type);
+                }
+            } catch (err) {
+                alert('Bir bağlantı hatası oluştu.');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // URL Hatalarını Yakala
         const urlParams = new URLSearchParams(window.location.search);
         const error = urlParams.get('error');
         if (error) {
             const errorDiv = document.getElementById('error-message');
             errorDiv.style.display = 'block';
-            
             const errorMap = {
-                'login_required': 'Bu sayfayı görmek için giriş yapmalısınız.',
-                'discord_auth_denied': 'Discord yetkilendirmesi reddedildi.',
-                'auth_failed': 'Giriş işlemi başarısız oldu. Lütfen tekrar deneyin.',
-                'missing_discord_config': 'Sistem yapılandırma hatası: Discord ayarları eksik.'
+                'login_required': 'Bu sayfayı görmek için giriş yapmalısınız.'
             };
-            
             errorDiv.textContent = errorMap[error] || 'Bir hata oluştu.';
         }
 
         // Oturum açık mı kontrol et
         fetch('/auth/me').then(res => res.json()).then(data => {
-            if (data.loggedIn) {
-                window.location.href = '/dashboard';
-            }
+            if (data.loggedIn) window.location.href = '/dashboard';
         });
     </script>
 </body>

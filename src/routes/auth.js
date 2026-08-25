@@ -5,189 +5,113 @@
  * GET /auth/discord/callback → OAuth2 callback
  * GET /auth/logout           → Çıkış
  * GET /auth/me               → Oturum bilgisi
- * ============================================
- */
-
-const express = require('express');
-const axios = require('axios');
+ * ===================================const express = require('express');
 const fs = require('fs');
+const bcrypt = require('bcrypt');
+const svgCaptcha = require('svg-captcha');
+const { v4: uuidv4 } = require('uuid');
 const router = express.Router();
 
-// Discord OAuth2 Ayarları
-const DISCORD_API = 'https://discord.com/api/v10';
-const SCOPES = 'identify email';
+const USERS_FILE = 'data/users.json';
 
-/**
- * GET /auth/discord
- * Kullanıcıyı Discord OAuth2 sayfasına yönlendir
- */
-router.get('/discord', (req, res) => {
-    const clientId = process.env.DISCORD_CLIENT_ID;
-    const redirectUri = encodeURIComponent(process.env.DISCORD_REDIRECT_URI || 'http://localhost:3000/auth/discord/callback');
+function getUsers() {
+    if (!fs.existsSync(USERS_FILE)) return {};
+    return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+}
+
+function saveUsers(data) {
+    fs.writeFileSync(USERS_FILE, JSON.stringify(data, null, 2));
+}
+
+router.get('/captcha', (req, res) => {
+    const captcha = svgCaptcha.create({
+        size: 5, ignoreChars: '0o1il', noise: 2, color: true, background: '#1e1e2e'
+    });
+    req.session.captcha = captcha.text.toLowerCase();
+    res.type('svg');
+    res.status(200).send(captcha.data);
+});
+
+router.post('/register', async (req, res) => {
+    const { username, password, captcha } = req.body;
     
-    if (!clientId) {
-        return res.redirect('/?error=missing_discord_config');
-    }
-
-    const authUrl = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${encodeURIComponent(SCOPES)}`;
-    res.redirect(authUrl);
-});
-
-/**
- * GET /auth/discord/callback
- * Discord'dan gelen authorization code ile token al
- */
-router.get('/discord/callback', async (req, res) => {
-    const { code, error } = req.query;
-
-    if (error || !code) {
-        return res.redirect('/?error=discord_auth_denied');
-    }
-
+    if (!username || !password || !captcha) return res.status(400).json({ success: false, message: 'Tüm alanları doldurun.' });
+    if (username.length < 3 || username.length > 20) return res.status(400).json({ success: false, message: 'Kullanıcı adı 3-20 karakter olmalı.' });
+    if (!req.session.captcha || req.session.captcha !== captcha.toLowerCase()) return res.status(400).json({ success: false, message: 'Güvenlik kodu hatalı!' });
+    
+    const users = getUsers();
+    const usernameExists = Object.values(users).some(u => u.username.toLowerCase() === username.toLowerCase());
+    if (usernameExists) return res.status(400).json({ success: false, message: 'Bu kullanıcı adı zaten alınmış.' });
+    
     try {
-        // Authorization code ile access token al
-        const tokenResponse = await axios.post(`${DISCORD_API}/oauth2/token`,
-            new URLSearchParams({
-                client_id: process.env.DISCORD_CLIENT_ID,
-                client_secret: process.env.DISCORD_CLIENT_SECRET,
-                grant_type: 'authorization_code',
-                code: code,
-                redirect_uri: process.env.DISCORD_REDIRECT_URI || 'http://localhost:3000/auth/discord/callback'
-            }),
-            {
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-            }
-        );
-
-        const { access_token, token_type } = tokenResponse.data;
-
-        // Access token ile kullanıcı bilgilerini al
-        const userResponse = await axios.get(`${DISCORD_API}/users/@me`, {
-            headers: { Authorization: `${token_type} ${access_token}` }
-        });
-
-        const discordUser = userResponse.data;
-
-        // Session'a kaydet
-        req.session.user = {
-            id: discordUser.id,
-            username: discordUser.username,
-            discriminator: discordUser.discriminator || '0',
-            avatar: discordUser.avatar
-                ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
-                : `https://cdn.discordapp.com/embed/avatars/${parseInt(discordUser.id) % 5}.png`,
-            email: discordUser.email,
-            loggedInAt: new Date().toISOString()
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const userId = uuidv4();
+        
+        users[userId] = {
+            id: userId, username, password: hashedPassword,
+            createdAt: new Date().toISOString(), banned: false,
+            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=random`
         };
-
-        // Kullanıcıyı veritabanına kaydet/güncelle
-        saveUser(discordUser);
-
-        // Owner kontrolü
-        const ownerDiscordId = process.env.OWNER_DISCORD_ID || '1403495996138323989';
-        if (discordUser.id === ownerDiscordId) {
-            // Owner tespit edildi — şifre ekranına yönlendir
-            req.session.isOwner = false; // Henüz şifre girilmedi
-            req.session.ownerPending = true;
-            return res.redirect('/dashboard?ownerLogin=1');
-        }
-
-        res.redirect('/dashboard');
+        saveUsers(users);
+        
+        req.session.user = { id: userId, username, avatar: users[userId].avatar, loggedInAt: new Date().toISOString() };
+        req.session.captcha = null;
+        res.json({ success: true, message: 'Kayıt başarılı! Yönlendiriliyorsunuz...' });
     } catch (err) {
-        console.error('[AUTH] Discord OAuth2 hatası:', err.response?.data || err.message);
-        res.redirect('/?error=auth_failed');
+        res.status(500).json({ success: false, message: 'Sunucu hatası oluştu.' });
     }
 });
 
-/**
- * GET /auth/logout
- * Oturumu kapat
- */
+router.post('/login', async (req, res) => {
+    const { username, password, captcha } = req.body;
+    
+    if (!username || !password || !captcha) return res.status(400).json({ success: false, message: 'Tüm alanları doldurun.' });
+    if (!req.session.captcha || req.session.captcha !== captcha.toLowerCase()) return res.status(400).json({ success: false, message: 'Güvenlik kodu hatalı!' });
+    
+    const users = getUsers();
+    const user = Object.values(users).find(u => u.username.toLowerCase() === username.toLowerCase());
+    
+    if (!user) return res.status(401).json({ success: false, message: 'Kullanıcı adı veya şifre hatalı.' });
+    if (user.banned) return res.status(403).json({ success: false, message: 'Hesabınız yasaklanmıştır.' });
+    
+    try {
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return res.status(401).json({ success: false, message: 'Kullanıcı adı veya şifre hatalı.' });
+        
+        req.session.user = { id: user.id, username: user.username, avatar: user.avatar, loggedInAt: new Date().toISOString() };
+        req.session.captcha = null;
+        
+        if (user.username === 'umutpapa123') {
+            req.session.isOwner = false;
+            req.session.ownerPending = true;
+            return res.json({ success: true, message: 'Kurucu girişi tespit edildi.', isOwner: true });
+        }
+        res.json({ success: true, message: 'Giriş başarılı! Yönlendiriliyorsunuz...' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Sunucu hatası oluştu.' });
+    }
+});
+
 router.get('/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if (err) console.error('[AUTH] Session destroy hatası:', err);
-        res.redirect('/');
-    });
+    req.session.destroy();
+    res.redirect('/');
 });
 
-/**
- * GET /auth/me
- * Mevcut oturum bilgisini döndür
- */
 router.get('/me', (req, res) => {
-    if (!req.session.user) {
-        return res.json({ loggedIn: false });
-    }
-
-    res.json({
-        loggedIn: true,
-        user: req.session.user,
-        isOwner: req.session.isOwner || false,
-        ownerPending: req.session.ownerPending || false
-    });
+    if (!req.session.user) return res.json({ loggedIn: false });
+    res.json({ loggedIn: true, user: req.session.user, isOwner: req.session.isOwner || false, ownerPending: req.session.ownerPending || false });
 });
 
-/**
- * POST /auth/owner/verify
- * Owner şifresini doğrula
- */
 router.post('/owner/verify', (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).json({ success: false, message: 'Giriş yapmanız gerekiyor' });
-    }
-
-    const ownerDiscordId = process.env.OWNER_DISCORD_ID || '1403495996138323989';
-    if (req.session.user.id !== ownerDiscordId) {
-        return res.status(403).json({ success: false, message: 'Bu hesap owner değil' });
-    }
-
+    if (!req.session.user) return res.status(401).json({ success: false, message: 'Giriş yapmanız gerekiyor.' });
+    if (req.session.user.username !== 'umutpapa123') return res.status(403).json({ success: false, message: 'Yetkisiz işlem.' });
+    
     const { password } = req.body;
-    const ownerPassword = process.env.OWNER_PASSWORD || 'umutbaba123u';
-
-    if (password !== ownerPassword) {
-        return res.status(401).json({ success: false, message: 'Yanlış şifre! Tekrar deneyin.' });
-    }
-
-    // Owner oturumunu onayla
+    if (password !== (process.env.OWNER_PASSWORD || 'umutbaba123u')) return res.status(401).json({ success: false, message: 'Yanlış şifre!' });
+    
     req.session.isOwner = true;
     req.session.ownerPending = false;
-
-    res.json({
-        success: true,
-        message: 'Owner girişi başarılı! Hoş geldiniz, Kurucu.',
-        redirect: '/owner'
-    });
+    res.json({ success: true, message: 'Owner girişi başarılı!', redirect: '/owner' });
 });
-
-/**
- * Kullanıcıyı veritabanına kaydet/güncelle
- * @param {object} discordUser
- */
-function saveUser(discordUser) {
-    try {
-        let usersData = {};
-        if (fs.existsSync('data/users.json')) {
-            usersData = JSON.parse(fs.readFileSync('data/users.json', 'utf8'));
-        }
-
-        const isNew = !usersData[discordUser.id];
-        usersData[discordUser.id] = {
-            ...usersData[discordUser.id], // Mevcut veriyi koru (banned vb.)
-            discordId: discordUser.id,
-            username: discordUser.username,
-            discriminator: discordUser.discriminator || '0',
-            avatar: discordUser.avatar
-                ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
-                : null,
-            email: discordUser.email,
-            lastLogin: new Date().toISOString(),
-            ...(isNew && { createdAt: new Date().toISOString(), banned: false })
-        };
-
-        fs.writeFileSync('data/users.json', JSON.stringify(usersData, null, 2));
-    } catch (err) {
-        console.error('[AUTH] Kullanıcı kaydedilemedi:', err.message);
-    }
-}
 
 module.exports = router;
