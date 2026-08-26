@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     checkOwnerAuth();
-    setInterval(fetchStats, 5000); // Her 5 saniyede bir stats güncelle
+    setInterval(fetchStats, 5000); // Her 5 saniyede bir stats gÃ¼ncelle
 });
 
 async function checkOwnerAuth() {
@@ -55,7 +55,7 @@ function renderUsers(users) {
     const tbody = document.getElementById('users-table');
     
     if (users.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Henüz kullanıcı yok</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">HenÃ¼z kullanÄ±cÄ± yok</td></tr>';
         return;
     }
 
@@ -73,7 +73,7 @@ function renderUsers(users) {
             </td>
             <td>
                 ${user.banned 
-                    ? '<span class="status-badge status-stopped">Banlı</span>' 
+                    ? '<span class="status-badge status-stopped">BanlÄ±</span>' 
                     : '<span class="status-badge status-running">Aktif</span>'}
             </td>
             <td>
@@ -92,8 +92,11 @@ function renderUsers(users) {
                 `).join('')}
             </td>
             <td>
-                <button class="btn-small ${user.banned ? 'success' : 'danger'}" onclick="toggleBan('${user.id}', ${!user.banned})">
+                <button class="btn-small ${user.banned ? 'success' : 'danger'}" onclick="toggleBan('${user.id}', ${!user.banned})" style="width:100%;">
                     <i class="fa-solid fa-gavel"></i> ${user.banned ? 'Banı Aç' : 'Banla'}
+                </button>
+                <button class="btn-small warning" onclick="quickAddCredit('${user.id}')" style="width:100%; margin-top:5px; color:#000;">
+                    <i class="fa-solid fa-coins"></i> Kredi Ekle
                 </button>
             </td>
         </tr>
@@ -107,21 +110,21 @@ async function forceProjectAction(projectId, action) {
         alert(data.message);
         fetchUsers();
         fetchStats();
-    } catch(err) { alert('Hata oluştu'); }
+    } catch(err) { alert('Hata oluÅŸtu'); }
 }
 
 async function forceProjectDelete(projectId) {
-    if(!confirm("Kullanıcının projesini kalıcı olarak silmek üzeresiniz. Emin misiniz?")) return;
+    if(!confirm("KullanÄ±cÄ±nÄ±n projesini kalÄ±cÄ± olarak silmek Ã¼zeresiniz. Emin misiniz?")) return;
     try {
         const res = await fetch(`/api/owner/project/${projectId}`, { method: 'DELETE' });
         const data = await res.json();
         alert(data.message);
         fetchUsers();
-    } catch(err) { alert('Hata oluştu'); }
+    } catch(err) { alert('Hata oluÅŸtu'); }
 }
 
 async function toggleBan(userId, banStatus) {
-    if(!confirm(`Kullanıcıyı ${banStatus ? 'banlamak' : 'yasağını kaldırmak'} istediğinize emin misiniz?`)) return;
+    if(!confirm(`KullanÄ±cÄ±yÄ± ${banStatus ? 'banlamak' : 'yasaÄŸÄ±nÄ± kaldÄ±rmak'} istediÄŸinize emin misiniz?`)) return;
     try {
         const res = await fetch(`/api/owner/ban/${userId}`, {
             method: 'POST',
@@ -131,7 +134,7 @@ async function toggleBan(userId, banStatus) {
         const data = await res.json();
         alert(data.message);
         fetchUsers();
-    } catch(err) { alert('Hata oluştu'); }
+    } catch(err) { alert('Hata oluÅŸtu'); }
 }
 
 async function sendAnnouncement() {
@@ -139,7 +142,7 @@ async function sendAnnouncement() {
     const message = document.getElementById('ann-msg').value;
     const type = document.getElementById('ann-type').value;
 
-    if(!title || !message) return alert('Başlık ve mesaj girin');
+    if(!title || !message) return alert('BaÅŸlÄ±k ve mesaj girin');
 
     try {
         const res = await fetch('/api/owner/announce', {
@@ -149,11 +152,11 @@ async function sendAnnouncement() {
         });
         const data = await res.json();
         if(data.success) {
-            alert('Duyuru yayınlandı!');
+            alert('Duyuru yayÄ±nlandÄ±!');
             document.getElementById('ann-title').value = '';
             document.getElementById('ann-msg').value = '';
         }
-    } catch(err) { alert('Duyuru gönderilemedi'); }
+    } catch(err) { alert('Duyuru gÃ¶nderilemedi'); }
 }
 
 async function manageCredits() {
@@ -177,6 +180,30 @@ async function manageCredits() {
         if (data.success) {
             alert(data.message);
             document.getElementById('credit-amount').value = '';
+            fetchUsers(); // Tabloyu guncelle
+        } else {
+            alert(data.message || 'Kredi islemi basarisiz.');
+        }
+    } catch(err) { 
+        alert('Kredi gonderilemedi.');
+    }
+}
+
+
+async function quickAddCredit(userId) {
+    const amount = prompt("Eklenecek Kredi Miktarini Girin (Orn: 100):");
+    if(!amount || isNaN(amount)) return;
+    
+    try {
+        const res = await fetch('/api/owner/credits/' + userId, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ amount: Number(amount), action: 'add' })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            alert(data.message);
             fetchUsers(); // Tabloyu guncelle
         } else {
             alert(data.message || 'Kredi islemi basarisiz.');
