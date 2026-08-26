@@ -67,6 +67,7 @@ function renderUsers(users) {
                     <div>
                         <span>${user.username}</span>
                         <small>ID: ${user.id}</small>
+                        <small style="color:var(--warning);display:block;margin-top:4px;"><i class="fa-solid fa-coins"></i> ${Math.floor(user.credits || 0)} Kredi</small>
                     </div>
                 </div>
             </td>
@@ -153,4 +154,34 @@ async function sendAnnouncement() {
             document.getElementById('ann-msg').value = '';
         }
     } catch(err) { alert('Duyuru gönderilemedi'); }
+}
+
+async function manageCredits() {
+    const userId = document.getElementById('credit-user-id').value.trim();
+    const amount = document.getElementById('credit-amount').value;
+    const action = document.getElementById('credit-action').value;
+
+    if(!userId || !amount) {
+        alert('Lutfen Kullanici ID ve Miktar giriniz.');
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/owner/credits/' + userId, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ amount: Number(amount), action: action })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            alert(data.message);
+            document.getElementById('credit-amount').value = '';
+            fetchUsers(); // Tabloyu guncelle
+        } else {
+            alert(data.message || 'Kredi islemi basarisiz.');
+        }
+    } catch(err) { 
+        alert('Kredi gonderilemedi.');
+    }
 }
