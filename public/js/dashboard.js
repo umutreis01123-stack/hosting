@@ -1,4 +1,4 @@
-﻿// State
+// State
 let currentUser = null;
 let currentProject = null;
 let editor = null;
@@ -77,10 +77,51 @@ function switchView(viewId) {
     const targetView = document.getElementById('view-' + viewId);
     if (targetView) targetView.classList.add('active');
     menuLinks.forEach(l => l.classList.remove('active'));
-    const link = document.querySelector('.menu a[data-view="' + viewId + '"]');
+    const link = document.querySelector('#main-menu a[data-view="' + viewId + '"]');
     if (link) link.classList.add('active');
     if (viewId === 'projects') loadProjects();
     if (viewId === 'project-detail' && currentProject && editor) { setTimeout(() => editor.refresh(), 100); }
+
+    // Sidebar toggle: proje detayindaysa proje menusunu goster
+    var mainMenu = document.getElementById('main-menu');
+    var projectMenu = document.getElementById('project-menu');
+    if (viewId === 'project-detail') {
+        if (mainMenu) mainMenu.style.display = 'none';
+        if (projectMenu) projectMenu.style.display = 'flex';
+    } else {
+        if (mainMenu) mainMenu.style.display = 'flex';
+        if (projectMenu) projectMenu.style.display = 'none';
+    }
+}
+
+function switchProjectTab(tabName) {
+    // Tum ptab-content gizle
+    var tabs = document.querySelectorAll('.ptab-content');
+    tabs.forEach(function(t) { t.style.display = 'none'; });
+    // Hedef sekmeyi goster
+    var target = document.getElementById('ptab-' + tabName);
+    if (target) {
+        target.style.display = tabName === 'files' ? 'flex' : (tabName === 'settings' ? 'flex' : 'block');
+    }
+    // Sidebar buton active durumu
+    var btns = document.querySelectorAll('#project-menu a');
+    btns.forEach(function(b) { b.classList.remove('active'); });
+    var activeBtn = document.getElementById('ptab-btn-' + tabName);
+    if (activeBtn) activeBtn.classList.add('active');
+    // Editor yenile (dosyalar sekmesi)
+    if (tabName === 'files' && editor) setTimeout(function() { editor.refresh(); }, 100);
+}
+
+async function openProject(id, name, running) {
+    currentProject = id;
+    document.getElementById('detail-name').textContent = name;
+    updateStatusUI(running);
+    switchView('project-detail');
+    switchProjectTab('files'); // varsayilan olarak Dosyalar sekmesini ac
+    loadFiles(id);
+    connectWebSocket(id);
+    fetchStatus();
+    loadDnsRecords();
 }
 
 menuLinks.forEach(link => {

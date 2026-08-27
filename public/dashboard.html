@@ -33,11 +33,19 @@
                 <h2>APEX <span>|</span></h2>
             </div>
             
-            <nav class="menu">
+            <nav class="menu" id="main-menu">
                 <a href="#" class="active" data-view="projects"><i class="fa-solid fa-server"></i> Projelerim</a>
                 <a href="#" data-view="upload"><i class="fa-solid fa-cloud-arrow-up"></i> Yeni Yükle</a>
                 <a href="#" data-view="support"><i class="fa-solid fa-robot"></i> Destek (Yapay Zeka)</a>
                 <a href="/owner" id="nav-owner-link" style="display: none; color: #ffb86c; font-weight: bold; margin-top: auto;"><i class="fa-solid fa-crown"></i> Kurucu Paneli</a>
+            </nav>
+
+            <nav class="menu" id="project-menu" style="display: none;">
+                <span style="color:var(--text-muted); font-size:0.75rem; padding: 0 1rem; text-transform:uppercase; letter-spacing:1px; margin-bottom: 0.5rem; display:block;">Proje Yönetimi</span>
+                <a href="#" id="ptab-btn-files" class="active" onclick="switchProjectTab('files')"><i class="fa-solid fa-folder-open"></i> Dosyalar</a>
+                <a href="#" id="ptab-btn-console" onclick="switchProjectTab('console')"><i class="fa-solid fa-terminal"></i> Canlı Konsol</a>
+                <a href="#" id="ptab-btn-settings" onclick="switchProjectTab('settings')"><i class="fa-solid fa-gear"></i> Ayarlar / DNS</a>
+                <a href="#" onclick="switchView('projects')" style="color:var(--danger); margin-top:auto;"><i class="fa-solid fa-arrow-left"></i> Geri Dön</a>
             </nav>
 
             <div class="user-profile">
@@ -140,66 +148,71 @@
                     <button class="btn-action danger ml-auto" onclick="deleteProject()"><i class="fa-solid fa-trash"></i> Projeyi Sil</button>
                 </div>
 
-                <!-- Bot Durumu & DNS Ayarlari -->
-                <div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap;">
-                    <!-- Bot Durumu -->
-                    <div style="flex:1;min-width:280px;background:var(--secondary);border:1px solid var(--border);border-radius:8px;padding:1rem;">
-                        <div class="panel-header"><i class="fa-solid fa-gamepad"></i> Bot Durumu</div>
-                        <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
-                            <select id="bot-status-type" style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.5rem;border-radius:4px;">
-                                <option value="Playing">Oynuyor</option>
-                                <option value="Watching">Izliyor</option>
-                                <option value="Listening">Dinliyor</option>
-                                <option value="Streaming">Yayinda</option>
-                            </select>
-                            <input type="text" id="bot-status-text" placeholder="Durum metni..." style="flex:2;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.5rem;border-radius:4px;">
-                        </div>
-                        <button class="btn-small success" style="margin-top:0.5rem;width:100%;" onclick="saveBotStatus()"><i class="fa-solid fa-floppy-disk"></i> Durumu Kaydet</button>
-                        <div id="bot-status-msg" style="font-size:0.8rem;color:var(--text-muted);margin-top:0.5rem;"></div>
-                    </div>
+                  <!-- SEKME: Ayarlar (DNS ve Durum) -->
+                  <div id="ptab-settings" class="ptab-content" style="display:none; flex-direction:column; gap:1rem; margin-top:1rem;">
+                      <div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap;">
+                          <!-- Bot Durumu -->
+                          <div style="flex:1;min-width:280px;background:var(--secondary);border:1px solid var(--border);border-radius:8px;padding:1rem;">
+                              <div class="panel-header"><i class="fa-solid fa-gamepad"></i> Bot Durumu</div>
+                              <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+                                  <select id="bot-status-type" style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.5rem;border-radius:4px;">
+                                      <option value="Playing">Oynuyor</option>
+                                      <option value="Watching">Izliyor</option>
+                                      <option value="Listening">Dinliyor</option>
+                                      <option value="Streaming">Yayinda</option>
+                                  </select>
+                                  <input type="text" id="bot-status-text" placeholder="Durum metni..." style="flex:2;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.5rem;border-radius:4px;">
+                              </div>
+                              <button class="btn-small success" style="margin-top:0.5rem;width:100%;" onclick="saveBotStatus()"><i class="fa-solid fa-floppy-disk"></i> Durumu Kaydet</button>
+                              <div id="bot-status-msg" style="font-size:0.8rem;color:var(--text-muted);margin-top:0.5rem;"></div>
+                          </div>
 
-                    <!-- DNS Yonetimi -->
-                    <div style="flex:1;min-width:280px;background:var(--secondary);border:1px solid var(--border);border-radius:8px;padding:1rem;">
-                        <div class="panel-header"><i class="fa-solid fa-globe"></i> DNS Kayitlari</div>
-                        <div id="dns-records-list" style="max-height:120px;overflow-y:auto;margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted);">Kayit yok</div>
-                        <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
-                            <select id="dns-type" style="width:80px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.4rem;border-radius:4px;font-size:0.85rem;">
-                                <option value="A">A</option>
-                                <option value="CNAME">CNAME</option>
-                                <option value="TXT">TXT</option>
-                            </select>
-                            <input type="text" id="dns-name" placeholder="Ad (@ veya sub)" style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.4rem;border-radius:4px;font-size:0.85rem;">
-                            <input type="text" id="dns-value" placeholder="Deger" style="flex:2;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.4rem;border-radius:4px;font-size:0.85rem;">
-                            <button class="btn-small" onclick="addDnsRecord()" style="font-size:0.85rem;"><i class="fa-solid fa-plus"></i></button>
-                        </div>
-                    </div>
-                </div>
+                          <!-- DNS Yonetimi -->
+                          <div style="flex:1;min-width:280px;background:var(--secondary);border:1px solid var(--border);border-radius:8px;padding:1rem;">
+                              <div class="panel-header"><i class="fa-solid fa-globe"></i> DNS Kayitlari</div>
+                              <div id="dns-records-list" style="max-height:120px;overflow-y:auto;margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted);">Kayit yok</div>
+                              <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+                                  <select id="dns-type" style="width:80px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.4rem;border-radius:4px;font-size:0.85rem;">
+                                      <option value="A">A</option>
+                                      <option value="CNAME">CNAME</option>
+                                      <option value="TXT">TXT</option>
+                                  </select>
+                                  <input type="text" id="dns-name" placeholder="Ad (@ veya sub)" style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.4rem;border-radius:4px;font-size:0.85rem;">
+                                  <input type="text" id="dns-value" placeholder="Deger" style="flex:2;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.4rem;border-radius:4px;font-size:0.85rem;">
+                                  <button class="btn-small" onclick="addDnsRecord()" style="font-size:0.85rem;"><i class="fa-solid fa-plus"></i></button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
 
-                <div class="workspace">
-                    <!-- Dosya Yöneticisi -->
-                    <div class="file-explorer">
-                        <div class="panel-header">Dosyalar</div>
-                        <div id="file-tree" class="file-tree"></div>
-                    </div>
+                  <!-- SEKME: Dosyalar -->
+                  <div id="ptab-files" class="ptab-content workspace" style="display:flex;">
+                      <!-- Dosya Yöneticisi -->
+                      <div class="file-explorer">
+                          <div class="panel-header">Dosyalar</div>
+                          <div id="file-tree" class="file-tree"></div>
+                      </div>
 
-                    <!-- Editör -->
-                    <div class="code-editor-area">
-                        <div class="panel-header flex-between">
-                            <span id="current-file-name">Bir dosya seçin...</span>
-                            <button class="btn-small success" id="btn-save-file" disabled><i class="fa-solid fa-floppy-disk"></i> Kaydet (Auto-Restart)</button>
-                        </div>
-                        <textarea id="code-editor"></textarea>
-                    </div>
+                      <!-- Editör -->
+                      <div class="code-editor-area">
+                          <div class="panel-header flex-between">
+                              <span id="current-file-name">Bir dosya seçin...</span>
+                              <button class="btn-small success" id="btn-save-file" disabled><i class="fa-solid fa-floppy-disk"></i> Kaydet (Auto-Restart)</button>
+                          </div>
+                          <textarea id="code-editor"></textarea>
+                      </div>
+                  </div>
 
-                    <!-- Terminal -->
-                    <div class="terminal-area">
-                        <div class="panel-header flex-between">
-                            <span><i class="fa-solid fa-terminal"></i> Canlı Konsol</span>
-                            <button class="btn-small" onclick="clearTerminal()"><i class="fa-solid fa-eraser"></i></button>
-                        </div>
-                        <div id="terminal-output" class="terminal-output"></div>
-                    </div>
-                </div>
+                  <!-- SEKME: Konsol -->
+                  <div id="ptab-console" class="ptab-content" style="display:none; flex:1; margin-top:1rem; min-height: 400px;">
+                      <div class="terminal-area" style="height:100%;">
+                          <div class="panel-header flex-between">
+                              <span><i class="fa-solid fa-terminal"></i> Canlı Konsol</span>
+                              <button class="btn-small" onclick="clearTerminal()"><i class="fa-solid fa-eraser"></i></button>
+                          </div>
+                          <div id="terminal-output" class="terminal-output"></div>
+                      </div>
+                  </div>
             </div>
         </main>
     </div>

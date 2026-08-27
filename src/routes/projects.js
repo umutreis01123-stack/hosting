@@ -1,7 +1,7 @@
 /**
  * ============================================
- * APEX | Hosting â€” Projects Routes
- * KullanÄ±cÄ±larÄ±n projelerini listeleme, durdurma/baÅŸlatma
+ * APEX | Hosting Ã¢â‚¬â€ Projects Routes
+ * KullanÃ„Â±cÃ„Â±larÃ„Â±n projelerini listeleme, durdurma/baÃ…Å¸latma
  * ============================================
  */
 
@@ -15,25 +15,25 @@ const router = express.Router();
 router.use(requireAuth);
 
 /**
- * Sahiplik kontrolÃ¼ iÃ§in yardÄ±mcÄ± fonksiyon
+ * Sahiplik kontrolÃƒÂ¼ iÃƒÂ§in yardÃ„Â±mcÃ„Â± fonksiyon
  */
 const getProjectOwner = async (req) => {
     const projects = JSON.parse(await fs.readFile('data/projects.json', 'utf8'));
     const project = projects[req.params.id];
-    if (!project) throw new Error('Proje bulunamadÄ±');
+    if (!project) throw new Error('Proje bulunamadÃ„Â±');
     return project.owner;
 };
 
 /**
  * GET /api/projects
- * KullanÄ±cÄ±nÄ±n kendi projelerini listele
+ * KullanÃ„Â±cÃ„Â±nÃ„Â±n kendi projelerini listele
  */
 router.get('/', async (req, res) => {
     try {
         const projects = JSON.parse(await fs.readFile('data/projects.json', 'utf8'));
         const userProjects = Object.values(projects).filter(p => p.owner === req.session.user.id);
         
-        // Ã‡alÄ±ÅŸma durumlarÄ±nÄ± ekle
+        // Ãƒâ€¡alÃ„Â±Ã…Å¸ma durumlarÃ„Â±nÃ„Â± ekle
         const runningProjects = processManager.getRunningProjects();
         
         const enhancedProjects = userProjects.map(p => {
@@ -47,13 +47,13 @@ router.get('/', async (req, res) => {
 
         res.json({ success: true, projects: enhancedProjects });
     } catch (err) {
-        res.status(500).json({ success: false, message: 'Projeler alÄ±namadÄ±' });
+        res.status(500).json({ success: false, message: 'Projeler alÃ„Â±namadÃ„Â±' });
     }
 });
 
 /**
  * GET /api/projects/:id/status
- * Projenin durumunu ve son loglarÄ±nÄ± getir
+ * Projenin durumunu ve son loglarÃ„Â±nÃ„Â± getir
  */
 router.get('/:id/status', requireOwnership(getProjectOwner), async (req, res) => {
     try {
@@ -66,7 +66,7 @@ router.get('/:id/status', requireOwnership(getProjectOwner), async (req, res) =>
 
 /**
  * POST /api/projects/:id/start
- * Projeyi baÅŸlat
+ * Projeyi baÃ…Å¸lat
  */
 router.post('/:id/start', requireOwnership(getProjectOwner), async (req, res) => {
     try {
@@ -74,7 +74,7 @@ router.post('/:id/start', requireOwnership(getProjectOwner), async (req, res) =>
         const project = projects[req.params.id];
         
         await processManager.startProject(req.params.id, project);
-        res.json({ success: true, message: 'Proje baÅŸlatÄ±ldÄ±' });
+        res.json({ success: true, message: 'Proje baÃ…Å¸latÃ„Â±ldÃ„Â±' });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -95,7 +95,7 @@ router.post('/:id/stop', requireOwnership(getProjectOwner), async (req, res) => 
 
 /**
  * POST /api/projects/:id/restart
- * Projeyi yeniden baÅŸlat
+ * Projeyi yeniden baÃ…Å¸lat
  */
 router.post('/:id/restart', requireOwnership(getProjectOwner), async (req, res) => {
     try {
@@ -103,7 +103,7 @@ router.post('/:id/restart', requireOwnership(getProjectOwner), async (req, res) 
         const project = projects[req.params.id];
         
         await processManager.restartProject(req.params.id, project);
-        res.json({ success: true, message: 'Proje yeniden baÅŸlatÄ±ldÄ±' });
+        res.json({ success: true, message: 'Proje yeniden baÃ…Å¸latÃ„Â±ldÃ„Â±' });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -117,20 +117,20 @@ router.delete('/:id', requireOwnership(getProjectOwner), async (req, res) => {
     try {
         const projectId = req.params.id;
         
-        // Ã–nce durdur
+        // Ãƒâ€“nce durdur
         await processManager.stopProject(projectId);
         
-        // VeritabanÄ±ndan sil
+        // VeritabanÃ„Â±ndan sil
         const projects = JSON.parse(await fs.readFile('data/projects.json', 'utf8'));
         delete projects[projectId];
         await fs.writeFile('data/projects.json', JSON.stringify(projects, null, 2));
         
-        // DosyalarÄ± sil
+        // DosyalarÃ„Â± sil
         await fs.remove(path.join(process.cwd(), 'projects', projectId));
         
-        res.json({ success: true, message: 'Proje baÅŸarÄ±yla silindi' });
+        res.json({ success: true, message: 'Proje baÃ…Å¸arÃ„Â±yla silindi' });
     } catch (err) {
-        res.status(500).json({ success: false, message: 'Proje silinirken hata oluÅŸtu' });
+        res.status(500).json({ success: false, message: 'Proje silinirken hata oluÃ…Å¸tu' });
     }
 });
 
@@ -141,23 +141,30 @@ router.delete('/:id', requireOwnership(getProjectOwner), async (req, res) => {
 router.post('/:id/status-config', async (req, res) => {
     try {
         const { type, text } = req.body;
-        const envPath = path.join(process.cwd(), 'projects', req.params.id, '.env');
+        const projectDir = path.join(process.cwd(), 'projects', req.params.id);
+        await fs.ensureDir(projectDir);
+        const envPath = path.join(projectDir, '.env');
         let envContent = '';
         if (await fs.pathExists(envPath)) {
             envContent = await fs.readFile(envPath, 'utf8');
         }
         
         // Eski durumlari temizle
-        envContent = envContent.split('\n').filter(line => !line.startsWith('BOT_STATUS_TYPE=') && !line.startsWith('BOT_STATUS_TEXT=')).join('\n');
+        var lines = envContent.split('\n');
+        var filtered = [];
+        for (var i = 0; i < lines.length; i++) {
+            if (!lines[i].startsWith('BOT_STATUS_TYPE=') && !lines[i].startsWith('BOT_STATUS_TEXT=')) {
+                filtered.push(lines[i]);
+            }
+        }
+        filtered.push('BOT_STATUS_TYPE=' + type);
+        filtered.push('BOT_STATUS_TEXT=' + text);
         
-        // Yeni durumlari ekle
-        envContent += "\\nBOT_STATUS_TYPE=" + type;
-        envContent += "\\nBOT_STATUS_TEXT=\"" + text + "\"";
-        
-        await fs.writeFile(envPath, envContent.trim());
-        res.json({ success: true, message: 'Bot durumu .env dosyasina kaydedildi. Yeniden baslatildiginda aktif olur.' });
+        await fs.writeFile(envPath, filtered.join('\n').trim());
+        res.json({ success: true, message: 'Bot durumu kaydedildi! Projeyi yeniden baslatinca aktif olur.' });
     } catch (e) {
-        res.status(500).json({ success: false, message: 'Durum kaydedilemedi' });
+        console.error('[STATUS] Hata:', e.message);
+        res.status(500).json({ success: false, message: 'Durum kaydedilemedi: ' + e.message });
     }
 });
 
@@ -198,4 +205,5 @@ router.post('/:id/dns', async (req, res) => {
 });
 
 module.exports = router;
+
 

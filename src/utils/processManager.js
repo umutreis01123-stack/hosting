@@ -1,8 +1,8 @@
-/**
+﻿/**
  * ============================================
- * APEX | Hosting — Process Manager
- * child_process ile bot/web projelerini yönetir
- * Her proje izole bir Node.js sürecinde çalışır
+ * APEX | Hosting â€” Process Manager
+ * child_process ile bot/web projelerini yÃ¶netir
+ * Her proje izole bir Node.js sÃ¼recinde Ã§alÄ±ÅŸÄ±r
  * ============================================
  */
 
@@ -11,14 +11,14 @@ const path = require('path');
 const fs = require('fs');
 const { EventEmitter } = require('events');
 
-// Çalışan süreçlerin kaydı
+// Ã‡alÄ±ÅŸan sÃ¼reÃ§lerin kaydÄ±
 // { projectId: { process, logs, startTime, subscribers, restartCount } }
 const runningProcesses = new Map();
 
-// Log tamponu (her proje için son 500 satır)
+// Log tamponu (her proje iÃ§in son 500 satÄ±r)
 const LOG_BUFFER_SIZE = 500;
 
-// WebSocket sunucusu referansı
+// WebSocket sunucusu referansÄ±
 let wssInstance = null;
 
 /**
@@ -30,13 +30,13 @@ function setWss(wss) {
 }
 
 /**
- * Projeyi başlat
+ * Projeyi baÅŸlat
  * @param {string} projectId - Proje ID'si
  * @param {object} project - Proje verisi (type, path, mainFile)
  * @returns {Promise<{success: boolean, message: string}>}
  */
 async function startProject(projectId, project) {
-    // Zaten çalışıyorsa durdur
+    // Zaten Ã§alÄ±ÅŸÄ±yorsa durdur
     if (runningProcesses.has(projectId)) {
         await stopProject(projectId);
     }
@@ -44,19 +44,19 @@ async function startProject(projectId, project) {
     const projectPath = path.join(process.cwd(), 'projects', projectId);
 
     if (!fs.existsSync(projectPath)) {
-        throw new Error('Proje dizini bulunamadı');
+        throw new Error('Proje dizini bulunamadÄ±');
     }
 
-    // npm install çalıştır (package.json varsa)
+    // npm install Ã§alÄ±ÅŸtÄ±r (package.json varsa)
     const packageJsonPath = path.join(projectPath, 'package.json');
     if (fs.existsSync(packageJsonPath)) {
         await runNpmInstall(projectPath);
     }
 
-    // Başlatma komutunu belirle
+    // BaÅŸlatma komutunu belirle
     const { cmd, args } = getStartCommand(project, projectPath);
 
-    // Süreci başlat
+    // SÃ¼reci baÅŸlat
     const proc = spawn(cmd, args, {
         cwd: projectPath,
         env: { ...process.env, PORT: getProjectPort(projectId) },
@@ -73,30 +73,30 @@ async function startProject(projectId, project) {
 
     runningProcesses.set(projectId, processData);
 
-    // stdout logları yakala
+    // stdout loglarÄ± yakala
     proc.stdout.on('data', (data) => {
         const line = `[STDOUT] ${data.toString().trim()}`;
         addLog(projectId, line);
     });
 
-    // stderr logları yakala
+    // stderr loglarÄ± yakala
     proc.stderr.on('data', (data) => {
         const line = `[STDERR] ${data.toString().trim()}`;
         addLog(projectId, line);
     });
 
-    // Süreç kapandığında
+    // SÃ¼reÃ§ kapandÄ±ÄŸÄ±nda
     proc.on('close', (code) => {
-        const exitLine = `[SYSTEM] Süreç kapandı (kod: ${code}) — ${new Date().toLocaleString('tr-TR')}`;
+        const exitLine = `[SYSTEM] SÃ¼reÃ§ kapandÄ± (kod: ${code}) â€” ${new Date().toLocaleString('tr-TR')}`;
         addLog(projectId, exitLine);
         
-        // Süreç kaydını güncelle ama tamamen kaldırma (log'lar kalsın)
+        // SÃ¼reÃ§ kaydÄ±nÄ± gÃ¼ncelle ama tamamen kaldÄ±rma (log'lar kalsÄ±n)
         if (runningProcesses.has(projectId)) {
             const data = runningProcesses.get(projectId);
-            data.process = null; // Süreç artık çalışmıyor
+            data.process = null; // SÃ¼reÃ§ artÄ±k Ã§alÄ±ÅŸmÄ±yor
         }
         
-        // projects.json'da durumu güncelle
+        // projects.json'da durumu gÃ¼ncelle
         updateProjectStatus(projectId, 'stopped');
     });
 
@@ -105,10 +105,10 @@ async function startProject(projectId, project) {
         addLog(projectId, errLine);
     });
 
-    // projects.json'da durumu güncelle
+    // projects.json'da durumu gÃ¼ncelle
     updateProjectStatus(projectId, 'running');
 
-    return { success: true, message: 'Proje başarıyla başlatıldı' };
+    return { success: true, message: 'Proje baÅŸarÄ±yla baÅŸlatÄ±ldÄ±' };
 }
 
 /**
@@ -120,7 +120,7 @@ async function stopProject(projectId) {
     
     if (!data || !data.process) {
         updateProjectStatus(projectId, 'stopped');
-        return { success: true, message: 'Proje zaten durmuş' };
+        return { success: true, message: 'Proje zaten durmuÅŸ' };
     }
 
     return new Promise((resolve) => {
@@ -132,7 +132,7 @@ async function stopProject(projectId) {
             resolve({ success: true, message: 'Proje durduruldu' });
         });
 
-        // Önce nazikçe kapat, 5 saniye sonra zorla kapat
+        // Ã–nce nazikÃ§e kapat, 5 saniye sonra zorla kapat
         proc.kill('SIGTERM');
         setTimeout(() => {
             if (!proc.killed) proc.kill('SIGKILL');
@@ -141,13 +141,13 @@ async function stopProject(projectId) {
 }
 
 /**
- * Projeyi yeniden başlat
+ * Projeyi yeniden baÅŸlat
  * @param {string} projectId
  * @param {object} project
  */
 async function restartProject(projectId, project) {
     await stopProject(projectId);
-    // Kısa bekleme
+    // KÄ±sa bekleme
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     const data = runningProcesses.get(projectId) || { restartCount: 0, logs: [] };
@@ -161,7 +161,7 @@ async function restartProject(projectId, project) {
 }
 
 /**
- * Projenin çalışma bilgilerini getir
+ * Projenin Ã§alÄ±ÅŸma bilgilerini getir
  * @param {string} projectId
  */
 function getProcessInfo(projectId) {
@@ -174,13 +174,13 @@ function getProcessInfo(projectId) {
     return {
         running: data.process !== null && !data.process.killed,
         uptime: data.startTime ? Date.now() - data.startTime : 0,
-        logs: data.logs.slice(-100), // Son 100 satır
+        logs: data.logs.slice(-100), // Son 100 satÄ±r
         restartCount: data.restartCount || 0
     };
 }
 
 /**
- * Log ekle ve abonelere gönder
+ * Log ekle ve abonelere gÃ¶nder
  * @param {string} projectId
  * @param {string} line
  */
@@ -195,17 +195,17 @@ function addLog(projectId, line) {
     const data = runningProcesses.get(projectId);
     data.logs.push(logEntry);
     
-    // Buffer boyutunu aş
+    // Buffer boyutunu aÅŸ
     if (data.logs.length > LOG_BUFFER_SIZE) {
         data.logs = data.logs.slice(-LOG_BUFFER_SIZE);
     }
 
-    // WebSocket abonelerine gönder
+    // WebSocket abonelerine gÃ¶nder
     broadcastLog(projectId, logEntry);
 }
 
 /**
- * Log'u WebSocket abonelerine yayınla
+ * Log'u WebSocket abonelerine yayÄ±nla
  * @param {string} projectId
  * @param {string} logLine
  */
@@ -223,7 +223,7 @@ function broadcastLog(projectId, logLine) {
 }
 
 /**
- * Log akışına abone ol
+ * Log akÄ±ÅŸÄ±na abone ol
  * @param {string} projectId
  * @param {WebSocket} ws
  */
@@ -235,7 +235,7 @@ function subscribeToLogs(projectId, ws) {
     const data = runningProcesses.get(projectId);
     data.subscribers.add(ws);
 
-    // Önceki logları gönder
+    // Ã–nceki loglarÄ± gÃ¶nder
     data.logs.slice(-100).forEach(line => {
         if (ws.readyState === 1) {
             ws.send(JSON.stringify({ type: 'log', projectId, line }));
@@ -244,7 +244,7 @@ function subscribeToLogs(projectId, ws) {
 }
 
 /**
- * Log akışı aboneliğini iptal et
+ * Log akÄ±ÅŸÄ± aboneliÄŸini iptal et
  * @param {string} projectId
  * @param {WebSocket} ws
  */
@@ -254,7 +254,7 @@ function unsubscribeFromLogs(projectId, ws) {
 }
 
 /**
- * npm install çalıştır
+ * npm install Ã§alÄ±ÅŸtÄ±r
  * @param {string} projectPath
  */
 function runNpmInstall(projectPath) {
@@ -272,7 +272,7 @@ function runNpmInstall(projectPath) {
 }
 
 /**
- * Proje türüne göre başlatma komutunu belirle
+ * Proje tÃ¼rÃ¼ne gÃ¶re baÅŸlatma komutunu belirle
  * @param {object} project
  * @param {string} projectPath
  */
@@ -287,7 +287,7 @@ function getStartCommand(project, projectPath) {
             }
         }
         
-        // HTML/Static site — basit HTTP sunucu
+        // HTML/Static site â€” basit HTTP sunucu
         const indexHtml = path.join(projectPath, 'index.html');
         if (fs.existsSync(indexHtml)) {
             // npx serve kullan
@@ -301,18 +301,18 @@ function getStartCommand(project, projectPath) {
 }
 
 /**
- * Projede ana dosyayı bul
+ * Projede ana dosyayÄ± bul
  * @param {string} projectPath
  */
 function findMainFile(projectPath) {
-    // package.json main alanını kontrol et
+    // package.json main alanÄ±nÄ± kontrol et
     const packageJsonPath = path.join(projectPath, 'package.json');
     if (fs.existsSync(packageJsonPath)) {
         const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
         if (pkg.main) return pkg.main;
     }
     
-    // Yaygın dosya isimlerini dene
+    // YaygÄ±n dosya isimlerini dene
     const candidates = ['index.js', 'app.js', 'main.js', 'bot.js', 'server.js', 'start.js'];
     for (const candidate of candidates) {
         if (fs.existsSync(path.join(projectPath, candidate))) {
@@ -320,11 +320,11 @@ function findMainFile(projectPath) {
         }
     }
     
-    return 'index.js'; // Varsayılan
+    return 'index.js'; // VarsayÄ±lan
 }
 
 /**
- * Proje için port numarası ata (3001'den başlayarak)
+ * Proje iÃ§in port numarasÄ± ata (3001'den baÅŸlayarak)
  * @param {string} projectId
  */
 function getProjectPort(projectId) {
@@ -347,7 +347,7 @@ function getProjectPort(projectId) {
 }
 
 /**
- * projects.json'da proje durumunu güncelle
+ * projects.json'da proje durumunu gÃ¼ncelle
  * @param {string} projectId
  * @param {string} status
  */
@@ -362,15 +362,15 @@ function updateProjectStatus(projectId, status) {
             fs.writeFileSync('data/projects.json', JSON.stringify(projectsData, null, 2));
         }
     } catch (err) {
-        console.error('[PROCESS MANAGER] Durum güncellenemedi:', err.message);
+        console.error('[PROCESS MANAGER] Durum gÃ¼ncellenemedi:', err.message);
     }
 }
 
 /**
- * Tüm projeleri durdur (sunucu kapanışında)
+ * TÃ¼m projeleri durdur (sunucu kapanÄ±ÅŸÄ±nda)
  */
 function stopAll() {
-    console.log('[APEX] Tüm projeler durduruluyor...');
+    console.log('[APEX] TÃ¼m projeler durduruluyor...');
     runningProcesses.forEach((data, projectId) => {
         if (data.process) {
             data.process.kill('SIGTERM');
@@ -380,7 +380,7 @@ function stopAll() {
 }
 
 /**
- * Tüm çalışan süreçlerin listesi
+ * TÃ¼m Ã§alÄ±ÅŸan sÃ¼reÃ§lerin listesi
  */
 function getRunningProjects() {
     const result = [];
@@ -407,3 +407,4 @@ module.exports = {
     addLog,
     stopAll
 };
+
