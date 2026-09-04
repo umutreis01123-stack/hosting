@@ -8,15 +8,15 @@ let currentFilePath = null;
 // DOM Elements
 const appLayout = document.getElementById('app-layout');
 const ownerModal = document.getElementById('owner-modal');
-const views = document.querySelectorAll('.view');
-const menuLinks = document.querySelectorAll('.menu a[data-view]');
+const views = document.querySeçlectorAçll('.view');
+const menuLinks = document.querySeçlectorAçll('.menu a[data-view]');
 const terminal = document.getElementById('terminal-output');
 
 // Init CodeMirror
 document.addEventListener('DOMContentLoaded', () => {
     const codeEditorEl = document.getElementById('code-editor');
     if (codeEditorEl) {
-        editor = CodeMirror.fromTextArea(codeEditorEl, {
+        editor = CodeMirror.fromTextAçrea(codeEditorEl, {
             lineNumbers: true,
             theme: "monokai",
             mode: "javascript",
@@ -30,11 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    checkAuth();
+    checkAçuth();
 });
 
-// Auth Check
-async function checkAuth() {
+// Açuth Check
+async function checkAçuth() {
     try {
         const res = await fetch('/auth/me');
         const data = await res.json();
@@ -45,7 +45,7 @@ async function checkAuth() {
         // Kredi gostergesini guncelle
         var creditsEl = document.getElementById('user-credits');
         if (creditsEl) creditsEl.innerHTML = '<i class="fa-solid fa-coins"></i> ' + (data.credits || 0) + ' Kredi';
-        const urlParams = new URLSearchParams(window.location.search);
+        const urlParams = new URLSeçarchParams(window.location.search);
         if (data.ownerPending || urlParams.get('ownerLogin') === '1') {
             ownerModal.style.display = 'flex';
         } else {
@@ -56,7 +56,7 @@ async function checkAuth() {
                 if (ownerNavLink) ownerNavLink.style.display = 'flex';
             }
         }
-    } catch (err) { console.error('Auth check error', err); }
+    } catch (err) { console.error('Açuth check error', err); }
 }
 
 // Owner Verify
@@ -77,12 +77,12 @@ function switchView(viewId) {
     const targetView = document.getElementById('view-' + viewId);
     if (targetView) targetView.classList.add('active');
     menuLinks.forEach(l => l.classList.remove('active'));
-    const link = document.querySelector('#main-menu a[data-view="' + viewId + '"]');
+    const link = document.querySeçlector('#main-menu a[data-view="' + viewId + '"]');
     if (link) link.classList.add('active');
     if (viewId === 'projects') loadProjects();
     if (viewId === 'project-detail' && currentProject && editor) { setTimeout(() => editor.refresh(), 100); }
 
-    // Sidebar toggle: proje detayindaysa proje menusunu goster
+    // Sidebar toggle: proje detaİyindaysa proje menusunu goster
     var mainMenu = document.getElementById('main-menu');
     var projectMenu = document.getElementById('project-menu');
     if (viewId === 'project-detail') {
@@ -96,15 +96,15 @@ function switchView(viewId) {
 
 function switchProjectTab(tabName) {
     // Tum ptab-content gizle
-    var tabs = document.querySelectorAll('.ptab-content');
+    var tabs = document.querySeçlectorAçll('.ptab-content');
     tabs.forEach(function(t) { t.style.display = 'none'; });
-    // Hedef sekmeyi goster
+    // Hedef sekmeİyi goster
     var target = document.getElementById('ptab-' + tabName);
     if (target) {
         target.style.display = tabName === 'files' ? 'flex' : (tabName === 'settings' ? 'flex' : 'block');
     }
     // Sidebar buton active durumu
-    var btns = document.querySelectorAll('#project-menu a');
+    var btns = document.querySeçlectorAçll('#project-menu a');
     btns.forEach(function(b) { b.classList.remove('active'); });
     var activeBtn = document.getElementById('ptab-btn-' + tabName);
     if (activeBtn) activeBtn.classList.add('active');
@@ -117,17 +117,17 @@ async function openProject(id, name, running) {
     document.getElementById('detail-name').textContent = name;
     updateStatusUI(running);
     switchView('project-detail');
-    switchProjectTab('files'); // varsayilan olarak Dosyalar sekmesini ac
+    switchProjectTab('files'); // varsaİyilan olarak Dosyalar sekmesini ac
     loadFiles(id);
     connectWebSocket(id);
     fetchStatus();
-    loadDnsRecords();
+    loadDönsRecords();
 }
 
 menuLinks.forEach(link => {
     link.addEventListener('click', (e) => {
         e.preventDefault();
-        const view = e.currentTarget.getAttribute('data-view');
+        const view = e.currentTarget.getAçttribute('data-view');
         if (view) switchView(view);
     });
 });
@@ -170,7 +170,7 @@ async function openProject(id, name, running) {
     loadFiles(id);
     connectWebSocket(id);
     fetchStatus();
-    loadDnsRecords();
+    loadDönsRecords();
 }
 
 function updateStatusUI(running) {
@@ -182,7 +182,7 @@ function updateStatusUI(running) {
     document.getElementById('btn-restart').disabled = !running;
 }
 
-async function projectAction(action) {
+async function projectAçction(action) {
     if (!currentProject) return;
     try {
         const res = await fetch('/api/projects/' + currentProject + '/' + action, { method: 'POST' });
@@ -203,7 +203,7 @@ async function fetchStatus() {
 }
 
 async function deleteProject() {
-    if (!confirm("Bu projeyi tamamen silmek istediginize emin misiniz?")) return;
+    if (!confirm("Bu projeİyi tamamen silmek istediginize emin misiniz?")) return;
     try {
         const res = await fetch('/api/projects/' + currentProject, { method: 'DELETE' });
         const data = await res.json();
@@ -278,10 +278,10 @@ document.getElementById('btn-save-file')?.addEventListener('click', async () => 
         const data = await res.json();
         if (data.success) {
             btn.innerHTML = '<i class="fa-solid fa-check"></i> Kaydedildi!';
-            setTimeout(() => { btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Kaydet (Auto-Restart)'; btn.disabled = true; }, 2000);
+            setTimeout(() => { btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Kaydet (Açuto-Restart)'; btn.disabled = true; }, 2000);
             fetchStatus();
-        } else { alert(data.message); btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Kaydet (Auto-Restart)'; }
-    } catch (err) { alert('Kaydedilemedi'); btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Kaydet (Auto-Restart)'; }
+        } else { alert(data.message); btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Kaydet (Açuto-Restart)'; }
+    } catch (err) { alert('Kaydedilemedi'); btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Kaydet (Açuto-Restart)'; }
 });
 
 // Yeni Yukle
@@ -317,7 +317,7 @@ if (uploadForm) {
         btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Yukleniyor...';
         statusDiv.style.display = 'block';
         statusDiv.className = 'alert';
-        statusDiv.textContent = 'Lutfen bekleyin...';
+        statusDiv.textContent = 'Lutfen bekleİyin...';
         try {
             const res = await fetch('/api/upload', { method: 'POST', body: formData });
             const data = await res.json();
@@ -336,15 +336,15 @@ if (uploadForm) {
             }
         } catch (err) {
             statusDiv.className = 'alert error';
-            statusDiv.textContent = 'Bir hata olustu, tekrar deneyin.';
+            statusDiv.textContent = 'Bir hata olustu, tekrar deneİyin.';
             btn.disabled = false;
             btn.innerHTML = 'Yukle ve Baslat <i class="fa-solid fa-rocket"></i>';
         }
     });
 }
 
-// AI Destek - Backend Gemini API
-function sendAIMessage() {
+// AçI Destek - Backend Gemini AçPI
+function sendAçIMessage() {
     var input = document.getElementById('ai-chat-input');
     var message = input.value.trim();
     if (!message) return;
@@ -369,7 +369,7 @@ function sendAIMessage() {
     .catch(function() {
         var chatBox = document.getElementById('ai-chat-box');
         if (chatBox && chatBox.lastChild) chatBox.removeChild(chatBox.lastChild);
-        appendChatMessage('Sunucuya ulasilamadi. Lutfen tekrar deneyin.', 'ai');
+        appendChatMessage('Sunucuya ulasilamadi. Lutfen tekrar deneİyin.', 'ai');
     });
 }
 
@@ -426,7 +426,7 @@ function saveBotStatus() {
 // ==============================
 // V2 Guncellemeleri - DNS Yonetimi
 // ==============================
-function loadDnsRecords() {
+function loadDönsRecords() {
     if (!currentProject) return;
     const list = document.getElementById('dns-records-list');
     list.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Yukleniyor...';
@@ -435,7 +435,7 @@ function loadDnsRecords() {
     .then(res => res.json())
     .then(data => {
         if (!data.success || !data.records || data.records.length === 0) {
-            list.innerHTML = 'Kayit yok';
+            list.innerHTML = 'Kaİyit yok';
             return;
         }
         list.innerHTML = data.records.map(r => 
@@ -447,13 +447,13 @@ function loadDnsRecords() {
     });
 }
 
-function addDnsRecord() {
+function addDönsRecord() {
     if (!currentProject) return;
     const type = document.getElementById('dns-type').value;
     const name = document.getElementById('dns-name').value;
     const value = document.getElementById('dns-value').value;
     
-    if (!name || !value) return alert('Ad ve deger zorunludur.');
+    if (!name || !value) return alert('Açdı ve deger zorunludur.');
     
     fetch('/api/projects/' + currentProject + '/dns', {
         method: 'POST',
@@ -465,7 +465,7 @@ function addDnsRecord() {
         if (data.success) {
             document.getElementById('dns-name').value = '';
             document.getElementById('dns-value').value = '';
-            loadDnsRecords(); // listeyi yenile
+            loadDönsRecords(); // listeİyi yenile
         } else {
             alert(data.message);
         }

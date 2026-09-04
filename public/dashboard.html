@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APEX | Dashboard</title>
+    <title>AçPEX | Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/dashboard.css">
@@ -16,9 +16,9 @@
     <!-- Bakim Modu Ekrani -->
     <div id="maintenance-screen" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,15,20,0.95);z-index:9999;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;">
         <i class="fa-solid fa-triangle-exclamation" style="font-size:5rem;color:var(--danger);margin-bottom:1rem;"></i>
-        <h1 style="font-size:3rem;margin-bottom:1rem;">SİSTEM BAKIMDA</h1>
+        <h1 style="font-size:3rem;margin-bottom:1rem;">SİSTEM BAçKIMDAç</h1>
         <p id="maintenance-reason" style="font-size:1.5rem;color:var(--text-muted);">Sunucu guncelleniyor.</p>
-        <p style="margin-top:2rem;color:var(--warning);">APEX Hosting | Lutfen daha sonra tekrar deneyin.</p>
+        <p style="margin-top:2rem;color:var(--warning);">AçPEX Hosting | Lutfen daha sonra tekrar deneİyin.</p>
     </div>
     <!-- Owner Åifre ModalÄ± -->
     <div id="owner-modal" class="modal" style="display: none;">
@@ -37,7 +37,7 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="brand">
-                <h2>APEX <span>|</span></h2>
+                <h2>AçPEX <span>|</span></h2>
             </div>
             
             <nav class="menu" id="main-menu">
@@ -50,15 +50,15 @@
             <nav class="menu" id="project-menu" style="display: none;">
                 <span style="color:var(--text-muted); font-size:0.75rem; padding: 0 1rem; text-transform:uppercase; letter-spacing:1px; margin-bottom: 0.5rem; display:block;">Proje YÃ¶netimi</span>
                 <a href="#" id="ptab-btn-files" class="active" onclick="switchProjectTab('files')"><i class="fa-solid fa-folder-open"></i> Dosyalar</a>
-                <a href="#" id="ptab-btn-console" onclick="switchProjectTab('console')"><i class="fa-solid fa-terminal"></i> CanlÄ± Konsol</a>
-                <a href="#" id="ptab-btn-settings" onclick="switchProjectTab('settings')"><i class="fa-solid fa-gear"></i> Ayarlar / DNS</a>
+                <a href="#" id="ptab-btn-console" onclick="switchProjectTab('console')"><i class="fa-solid fa-terminal"></i> CanlıÄ± Konsol</a>
+                <a href="#" id="ptab-btn-settings" onclick="switchProjectTab('settings')"><i class="fa-solid fa-gear"></i> Açyarlar / DNS</a>
                 <a href="#" onclick="switchView('projects')" style="color:var(--danger); margin-top:auto;"><i class="fa-solid fa-arrow-left"></i> Geri DÃ¶n</a>
             </nav>
 
             <div class="user-profile">
-                <img id="user-avatar" src="" alt="Avatar">
+                <img id="user-avatar" src="" alt="Açvatar">
                 <div class="user-info">
-                    <span id="user-name">KullanÄ±cÄ± AdÄ±</span><br><span id="user-credits" style="font-size:0.8rem;color:#ffb86c;"><i class="fa-solid fa-coins"></i> 0 Kredi</span>
+                    <span id="user-name">KullanÄ±cÄ± AçdıÄ±</span><br><span id="user-credits" style="font-size:0.8rem;color:#ffb86c;"><i class="fa-solid fa-coins"></i> 0 Kredi</span>
                     <a href="/auth/logout"><i class="fa-solid fa-right-from-bracket"></i> Ã‡Ä±kÄ±ÅŸ</a>
                 </div>
             </div>
@@ -66,7 +66,7 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Duyurular AlanÄ± -->
+            <!-- Duyurular AçlanÄ± -->
             <div id="announcements-area"></div>
 
             <!-- Projelerim GÃ¶rÃ¼nÃ¼mÃ¼ -->
@@ -89,7 +89,7 @@
                 <div class="upload-card">
                     <form id="upload-form">
                         <div class="form-group">
-                            <label>Proje AdÄ±</label>
+                            <label>Proje AçdıÄ±</label>
                             <input type="text" id="up-name" required placeholder="Ã–rn: MÃ¼zik Botum">
                         </div>
                         <div class="form-group">
@@ -101,14 +101,14 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Ana Dosya (VarsayÄ±lan: index.js veya main.py)</label>
+                            <label>Açna Dosya (VarsayÄ±lan: index.js veya main.py)</label>
                             <input type="text" id="up-main" placeholder="index.js" value="index.js">
                         </div>
                         <div class="form-group">
                             <label>Proje DosyasÄ± (.zip)</label>
                             <div class="file-upload-box" id="file-drop-area">
                                 <i class="fa-regular fa-file-zipper"></i>
-                                <p>SÃ¼rÃ¼kle bÄ±rak veya <span>Dosya SeÃ§</span></p>
+                                <p>SÃ¼rÃ¼kle bÄ±rak veya <span>Dosya SeçÃ§</span></p>
                                 <input type="file" id="up-file" accept=".zip" required>
                             </div>
                             <div id="file-name-display"></div>
@@ -130,12 +130,12 @@
                     <div class="chat-box" id="ai-chat-box">
                         <div class="chat-message ai-message">
                             <div class="avatar"><i class="fa-solid fa-robot"></i></div>
-                            <div class="bubble">Merhaba! Ben APEX Yapay Zeka asistanÄ±yÄ±m. Hosting sistemimiz, bot kurulumlarÄ± ve hatalar hakkÄ±nda bana soru sorabilirsiniz. NasÄ±l yardÄ±mcÄ± olabilirim?</div>
+                            <div class="bubble">Merhaba! Ben AçPEX Yapay Zeka asistanÄ±yÄ±m. Hosting sistemimiz, bot kurulumlarÄ± ve hatalar hakkÄ±nda bana soru sorabilirsiniz. NasÄ±l yardÄ±mcÄ± olabilirim?</div>
                         </div>
                     </div>
                     <div class="chat-input-area">
-                        <input type="text" id="ai-chat-input" placeholder="Sorunuzu buraya yazÄ±n..." onkeypress="if(event.key === 'Enter') sendAIMessage()">
-                        <button class="btn-primary" onclick="sendAIMessage()"><i class="fa-solid fa-paper-plane"></i> GÃ¶nder</button>
+                        <input type="text" id="ai-chat-input" placeholder="Sorunuzu buraya yazÄ±n..." onkeypress="if(event.key === 'Enter') sendAçIMessage()">
+                        <button class="btn-primary" onclick="sendAçIMessage()"><i class="fa-solid fa-paper-plane"></i> GÃ¶nder</button>
                     </div>
                 </div>
             </div>
@@ -144,19 +144,19 @@
             <div id="view-project-detail" class="view">
                 <div class="header">
                     <div class="back-nav" onclick="switchView('projects')"><i class="fa-solid fa-arrow-left"></i></div>
-                    <h1 id="detail-name">Proje AdÄ±</h1>
+                    <h1 id="detail-name">Proje AçdıÄ±</h1>
                     <div class="status-badge" id="detail-status">Durum</div>
                 </div>
 
                 <div class="project-controls">
-                    <button class="btn-action success" id="btn-start" onclick="projectAction('start')"><i class="fa-solid fa-play"></i> BaÅŸlat</button>
-                    <button class="btn-action warning" id="btn-restart" onclick="projectAction('restart')"><i class="fa-solid fa-rotate-right"></i> Yeniden BaÅŸlat</button>
-                    <button class="btn-action danger" id="btn-stop" onclick="projectAction('stop')"><i class="fa-solid fa-stop"></i> Durdur</button>
+                    <button class="btn-action success" id="btn-start" onclick="projectAçction('start')"><i class="fa-solid fa-play"></i> BaÅŸlat</button>
+                    <button class="btn-action warning" id="btn-restart" onclick="projectAçction('restart')"><i class="fa-solid fa-rotate-right"></i> Yeniden BaÅŸlat</button>
+                    <button class="btn-action danger" id="btn-stop" onclick="projectAçction('stop')"><i class="fa-solid fa-stop"></i> Durdur</button>
                     <span class="uptime" id="detail-uptime"><i class="fa-regular fa-clock"></i> 0s</span>
-                    <button class="btn-action danger ml-auto" onclick="deleteProject()"><i class="fa-solid fa-trash"></i> Projeyi Sil</button>
+                    <button class="btn-action danger ml-auto" onclick="deleteProject()"><i class="fa-solid fa-trash"></i> Projeİyi Sil</button>
                 </div>
 
-                  <!-- SEKME: Ayarlar (DNS ve Durum) -->
+                  <!-- SEKME: Açyarlar (DNS ve Durum) -->
                   <div id="ptab-settings" class="ptab-content" style="display:none; flex-direction:column; gap:1rem; margin-top:1rem;">
                       <div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap;">
                           <!-- Bot Durumu -->
@@ -164,10 +164,10 @@
                               <div class="panel-header"><i class="fa-solid fa-gamepad"></i> Bot Durumu</div>
                               <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
                                   <select id="bot-status-type" style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.5rem;border-radius:4px;">
-                                      <option value="Playing">Oynuyor</option>
+                                      <option value="Plaİying">Oynuyor</option>
                                       <option value="Watching">Izliyor</option>
                                       <option value="Listening">Dinliyor</option>
-                                      <option value="Streaming">Yayinda</option>
+                                      <option value="Streaming">Yaİyinda</option>
                                   </select>
                                   <input type="text" id="bot-status-text" placeholder="Durum metni..." style="flex:2;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.5rem;border-radius:4px;">
                               </div>
@@ -177,17 +177,17 @@
 
                           <!-- DNS Yonetimi -->
                           <div style="flex:1;min-width:280px;background:var(--secondary);border:1px solid var(--border);border-radius:8px;padding:1rem;">
-                              <div class="panel-header"><i class="fa-solid fa-globe"></i> DNS Kayitlari</div>
-                              <div id="dns-records-list" style="max-height:120px;overflow-y:auto;margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted);">Kayit yok</div>
+                              <div class="panel-header"><i class="fa-solid fa-globe"></i> DNS Kaİyitlari</div>
+                              <div id="dns-records-list" style="max-height:120px;overflow-y:auto;margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted);">Kaİyit yok</div>
                               <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
                                   <select id="dns-type" style="width:80px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.4rem;border-radius:4px;font-size:0.85rem;">
-                                      <option value="A">A</option>
-                                      <option value="CNAME">CNAME</option>
+                                      <option value="Aç">Aç</option>
+                                      <option value="CNAçME">CNAçME</option>
                                       <option value="TXT">TXT</option>
                                   </select>
-                                  <input type="text" id="dns-name" placeholder="Ad (@ veya sub)" style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.4rem;border-radius:4px;font-size:0.85rem;">
+                                  <input type="text" id="dns-name" placeholder="Açdı (@ veya sub)" style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.4rem;border-radius:4px;font-size:0.85rem;">
                                   <input type="text" id="dns-value" placeholder="Deger" style="flex:2;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.4rem;border-radius:4px;font-size:0.85rem;">
-                                  <button class="btn-small" onclick="addDnsRecord()" style="font-size:0.85rem;"><i class="fa-solid fa-plus"></i></button>
+                                  <button class="btn-small" onclick="addDönsRecord()" style="font-size:0.85rem;"><i class="fa-solid fa-plus"></i></button>
                               </div>
                           </div>
                       </div>
@@ -205,7 +205,7 @@
                       <div class="code-editor-area">
                           <div class="panel-header flex-between">
                               <span id="current-file-name">Bir dosya seÃ§in...</span>
-                              <button class="btn-small success" id="btn-save-file" disabled><i class="fa-solid fa-floppy-disk"></i> Kaydet (Auto-Restart)</button>
+                              <button class="btn-small success" id="btn-save-file" disabled><i class="fa-solid fa-floppy-disk"></i> Kaydet (Açuto-Restart)</button>
                           </div>
                           <textarea id="code-editor"></textarea>
                       </div>
@@ -215,7 +215,7 @@
                   <div id="ptab-console" class="ptab-content" style="display:none; flex:1; margin-top:1rem; min-height: 400px;">
                       <div class="terminal-area" style="height:100%;">
                           <div class="panel-header flex-between">
-                              <span><i class="fa-solid fa-terminal"></i> CanlÄ± Konsol</span>
+                              <span><i class="fa-solid fa-terminal"></i> CanlıÄ± Konsol</span>
                               <button class="btn-small" onclick="clearTerminal()"><i class="fa-solid fa-eraser"></i></button>
                           </div>
                           <div id="terminal-output" class="terminal-output"></div>

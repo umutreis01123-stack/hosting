@@ -1,9 +1,9 @@
 ﻿document.addEventListener('DOMContentLoaded', () => {
-    checkOwnerAuth();
+    checkOwnerAçuth();
     setInterval(fetchStats, 5000); // Her 5 saniyede bir stats gÃƒÂ¼ncelle
 });
 
-async function checkOwnerAuth() {
+async function checkOwnerAçuth() {
     try {
         const res = await fetch('/auth/me');
         const data = await res.json();
@@ -74,7 +74,7 @@ function renderUsers(users) {
             <td>
                 ${user.banned 
                     ? '<span class="status-badge status-stopped">BanlÃ„Â±</span>' 
-                    : '<span class="status-badge status-running">Aktif</span>'}
+                    : '<span class="status-badge status-running">Açktif</span>'}
             </td>
             <td>
                 ${user.projects.length === 0 ? '<span style="color:var(--text-muted)">Proje Yok</span>' : ''}
@@ -83,7 +83,7 @@ function renderUsers(users) {
                         ${p.name} (${p.status === 'running' ? 'ON' : 'OFF'})
                         <div style="margin-top:5px; display:flex; gap:5px;">
                             <button class="btn-small ${p.status==='running' ? 'danger' : 'success'}" 
-                                onclick="forceProjectAction('${p.id}', '${p.status==='running' ? 'stop' : 'start'}')">
+                                onclick="forceProjectAçction('${p.id}', '${p.status==='running' ? 'stop' : 'start'}')">
                                 ${p.status === 'running' ? '<i class="fa-solid fa-stop"></i>' : '<i class="fa-solid fa-play"></i>'}
                             </button>
                             <button class="btn-small danger" onclick="forceProjectDelete('${p.id}')"><i class="fa-solid fa-trash"></i></button>
@@ -93,9 +93,9 @@ function renderUsers(users) {
             </td>
             <td>
                 <button class="btn-small ${user.banned ? 'success' : 'danger'}" onclick="toggleBan('${user.id}', ${!user.banned})" style="width:100%;">
-                    <i class="fa-solid fa-gavel"></i> ${user.banned ? 'BanÄ± AÃ§' : 'Banla'}
+                    <i class="fa-solid fa-gavel"></i> ${user.banned ? 'BanÄ± AçÃ§' : 'Banla'}
                 </button>
-                <button class="btn-small warning" onclick="quickAddCredit('${user.id}')" style="width:100%; margin-top:5px; color:#000;">
+                <button class="btn-small warning" onclick="quickAçdıdCredit('${user.id}')" style="width:100%; margin-top:5px; color:#000;">
                     <i class="fa-solid fa-coins"></i> Kredi Ekle
                 </button>
             </td>
@@ -103,7 +103,7 @@ function renderUsers(users) {
     `).join('');
 }
 
-async function forceProjectAction(projectId, action) {
+async function forceProjectAçction(projectId, action) {
     try {
         const res = await fetch(`/api/owner/project/${projectId}/${action}`, { method: 'POST' });
         const data = await res.json();
@@ -137,7 +137,7 @@ async function toggleBan(userId, banStatus) {
     } catch(err) { alert('Hata oluÃ…Å¸tu'); }
 }
 
-async function sendAnnouncement() {
+async function sendAçnnouncement() {
     const title = document.getElementById('ann-title').value;
     const message = document.getElementById('ann-msg').value;
     const type = document.getElementById('ann-type').value;
@@ -163,10 +163,10 @@ async function manageCredits() {
     const userId = document.getElementById('credit-user-id').value.trim();
     const amount = document.getElementById('credit-amount').value;
         let action = document.getElementById('credit-action').value;
-    let finalAmount = amount;
+    let finalAçmount = amount;
     if (action === 'reset') {
         action = 'set';
-        finalAmount = 0;
+        finalAçmount = 0;
     }
 
     if(!userId || !amount) {
@@ -178,7 +178,7 @@ async function manageCredits() {
         const res = await fetch('/api/owner/credits/' + userId, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ amount: Number(finalAmount), action: action })
+            body: JSON.stringify({ amount: Number(finalAçmount), action: action })
         });
         const data = await res.json();
         
@@ -195,7 +195,7 @@ async function manageCredits() {
 }
 
 
-async function quickAddCredit(userId) {
+async function quickAçdıdCredit(userId) {
     const amount = prompt("Eklenecek Kredi Miktarini Girin (Orn: 100):");
     if(!amount || isNaN(amount)) return;
     
@@ -203,7 +203,7 @@ async function quickAddCredit(userId) {
         const res = await fetch('/api/owner/credits/' + userId, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ amount: Number(finalAmount), action: 'add' })
+            body: JSON.stringify({ amount: Number(finalAçmount), action: 'add' })
         });
         const data = await res.json();
         
@@ -221,7 +221,7 @@ async function quickAddCredit(userId) {
 
 
 async function triggerMaintenance() {
-    const action = confirm('Bakim Modunu AKTIF etmek icin TAMAM, KAPATMAK icin IPTAL e basin.');
+    const action = confirm('Bakim Modunu AçKTIF etmek icin TAçMAçM, KAçPAçTMAçK icin IPTAçL e basin.');
     let reason = '';
     if(action) {
         reason = prompt('Bakim sebebi nedir? (Musterilere bu mesaj gosterilecek):');
