@@ -285,9 +285,8 @@ document.getElementById('btn-save-file')?.addEventListener('click', async () => 
 });
 
 // Yeni Yukle
-const uploadForm = document.getElementById('up-type').addEventListener('change', (e) => { document.getElementById('up-main').value = e.target.value === 'python' ? 'main.py' : 'index.js'; });
-
-document.getElementById('upload-form');
+document.getElementById('up-type').addEventListener('change', (e) => { document.getElementById('up-main').value = e.target.value === 'python' ? 'main.py' : 'index.js'; });
+const uploadForm = document.getElementById('upload-form');
 const upFile = document.getElementById('up-file');
 const fileDrop = document.getElementById('file-drop-area');
 const fileDisplay = document.getElementById('file-name-display');
@@ -492,3 +491,4 @@ async function checkMaintenance() {
 // Check every 30 seconds
 setInterval(checkMaintenance, 30000);
 document.addEventListener('DOMContentLoaded', checkMaintenance);
+
