@@ -132,18 +132,25 @@ function saveJsonData(filePath, data) { fs.writeFileSync(filePath, JSON.stringif
  */
 router.post('/maintenance', async (req, res) => {
     try {
-        const processManager = require('../utils/processManager');
-        const running = processManager.getRunningProjects();
-        let killedCount = 0;
-        for (const rp of running) {
-            await processManager.stopProject(rp.projectId);
-            killedCount++;
+        const { active, reason } = req.body;
+        await require('fs-extra').writeFile('data/maintenance.json', JSON.stringify({ active, reason: reason || 'Sistem guncelleniyor.' }));
+        if (active) {
+            const processManager = require('../utils/processManager');
+            const running = processManager.getRunningProjects();
+            let killedCount = 0;
+            for (const rp of running) {
+                await processManager.stopProject(rp.projectId);
+                killedCount++;
+            }
+            res.json({ success: true, message: 'Bakim Modu aktif edildi. ' + killedCount + ' proje durduruldu.' });
+        } else {
+            res.json({ success: true, message: 'Bakim Modu kapatildi.' });
         }
-        res.json({ success: true, message: Bakim Modu aktif! Toplam  proje basariyla durduruldu. });
     } catch(err) {
-        res.status(500).json({ success: false, message: 'Durdurma islemi başarisiz oldu.' });
+        res.status(500).json({ success: false, message: 'Islem basarisiz.' });
     }
 });
 
 module.exports = router;
+
 

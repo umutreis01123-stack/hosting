@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -13,15 +13,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
 </head>
 <body>
-    <!-- Owner Şifre Modalı -->
+    <!-- Bakim Modu Ekrani -->
+    <div id="maintenance-screen" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,15,20,0.95);z-index:9999;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size:5rem;color:var(--danger);margin-bottom:1rem;"></i>
+        <h1 style="font-size:3rem;margin-bottom:1rem;">SİSTEM BAKIMDA</h1>
+        <p id="maintenance-reason" style="font-size:1.5rem;color:var(--text-muted);">Sunucu guncelleniyor.</p>
+        <p style="margin-top:2rem;color:var(--warning);">APEX Hosting | Lutfen daha sonra tekrar deneyin.</p>
+    </div>
+    <!-- Owner Åifre ModalÄ± -->
     <div id="owner-modal" class="modal" style="display: none;">
         <div class="modal-content owner-modal-content">
-            <h2><i class="fa-solid fa-shield-halved"></i> Güvenlik Doğrulaması</h2>
-            <p>Kurucu hesabı tespit edildi. Lütfen güvenlik şifrenizi girin.</p>
-            <input type="password" id="owner-password" placeholder="Owner Şifresi...">
+            <h2><i class="fa-solid fa-shield-halved"></i> GÃ¼venlik DoÄŸrulamasÄ±</h2>
+            <p>Kurucu hesabÄ± tespit edildi. LÃ¼tfen gÃ¼venlik ÅŸifrenizi girin.</p>
+            <input type="password" id="owner-password" placeholder="Owner Åifresi...">
             <div id="owner-error" class="error-text"></div>
-            <button id="btn-owner-verify" class="btn-primary">Doğrula</button>
-            <a href="/auth/logout" class="text-link">Çıkış Yap</a>
+            <button id="btn-owner-verify" class="btn-primary">DoÄŸrula</button>
+            <a href="/auth/logout" class="text-link">Ã‡Ä±kÄ±ÅŸ Yap</a>
         </div>
     </div>
 
@@ -35,34 +42,34 @@
             
             <nav class="menu" id="main-menu">
                 <a href="#" class="active" data-view="projects"><i class="fa-solid fa-server"></i> Projelerim</a>
-                <a href="#" data-view="upload"><i class="fa-solid fa-cloud-arrow-up"></i> Yeni Yükle</a>
+                <a href="#" data-view="upload"><i class="fa-solid fa-cloud-arrow-up"></i> Yeni YÃ¼kle</a>
                 <a href="#" data-view="support"><i class="fa-solid fa-robot"></i> Destek (Yapay Zeka)</a>
                 <a href="/owner" id="nav-owner-link" style="display: none; color: #ffb86c; font-weight: bold; margin-top: auto;"><i class="fa-solid fa-crown"></i> Kurucu Paneli</a>
             </nav>
 
             <nav class="menu" id="project-menu" style="display: none;">
-                <span style="color:var(--text-muted); font-size:0.75rem; padding: 0 1rem; text-transform:uppercase; letter-spacing:1px; margin-bottom: 0.5rem; display:block;">Proje Yönetimi</span>
+                <span style="color:var(--text-muted); font-size:0.75rem; padding: 0 1rem; text-transform:uppercase; letter-spacing:1px; margin-bottom: 0.5rem; display:block;">Proje YÃ¶netimi</span>
                 <a href="#" id="ptab-btn-files" class="active" onclick="switchProjectTab('files')"><i class="fa-solid fa-folder-open"></i> Dosyalar</a>
-                <a href="#" id="ptab-btn-console" onclick="switchProjectTab('console')"><i class="fa-solid fa-terminal"></i> Canlı Konsol</a>
+                <a href="#" id="ptab-btn-console" onclick="switchProjectTab('console')"><i class="fa-solid fa-terminal"></i> CanlÄ± Konsol</a>
                 <a href="#" id="ptab-btn-settings" onclick="switchProjectTab('settings')"><i class="fa-solid fa-gear"></i> Ayarlar / DNS</a>
-                <a href="#" onclick="switchView('projects')" style="color:var(--danger); margin-top:auto;"><i class="fa-solid fa-arrow-left"></i> Geri Dön</a>
+                <a href="#" onclick="switchView('projects')" style="color:var(--danger); margin-top:auto;"><i class="fa-solid fa-arrow-left"></i> Geri DÃ¶n</a>
             </nav>
 
             <div class="user-profile">
                 <img id="user-avatar" src="" alt="Avatar">
                 <div class="user-info">
-                    <span id="user-name">Kullanıcı Adı</span><br><span id="user-credits" style="font-size:0.8rem;color:#ffb86c;"><i class="fa-solid fa-coins"></i> 0 Kredi</span>
-                    <a href="/auth/logout"><i class="fa-solid fa-right-from-bracket"></i> Çıkış</a>
+                    <span id="user-name">KullanÄ±cÄ± AdÄ±</span><br><span id="user-credits" style="font-size:0.8rem;color:#ffb86c;"><i class="fa-solid fa-coins"></i> 0 Kredi</span>
+                    <a href="/auth/logout"><i class="fa-solid fa-right-from-bracket"></i> Ã‡Ä±kÄ±ÅŸ</a>
                 </div>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Duyurular Alanı -->
+            <!-- Duyurular AlanÄ± -->
             <div id="announcements-area"></div>
 
-            <!-- Projelerim Görünümü -->
+            <!-- Projelerim GÃ¶rÃ¼nÃ¼mÃ¼ -->
             <div id="view-projects" class="view active">
                 <div class="header">
                     <h1>Projelerim</h1>
@@ -70,20 +77,20 @@
                 </div>
                 <div id="projects-list" class="projects-grid">
                     <!-- JS ile doldurulacak -->
-                    <div class="loader">Yükleniyor...</div>
+                    <div class="loader">YÃ¼kleniyor...</div>
                 </div>
             </div>
 
-            <!-- Yeni Yükle Görünümü -->
+            <!-- Yeni YÃ¼kle GÃ¶rÃ¼nÃ¼mÃ¼ -->
             <div id="view-upload" class="view">
                 <div class="header">
-                    <h1>Yeni Proje Yükle</h1>
+                    <h1>Yeni Proje YÃ¼kle</h1>
                 </div>
                 <div class="upload-card">
                     <form id="upload-form">
                         <div class="form-group">
-                            <label>Proje Adı</label>
-                            <input type="text" id="up-name" required placeholder="Örn: Müzik Botum">
+                            <label>Proje AdÄ±</label>
+                            <input type="text" id="up-name" required placeholder="Ã–rn: MÃ¼zik Botum">
                         </div>
                         <div class="form-group">
                             <label>Proje Tipi</label>
@@ -94,14 +101,14 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Ana Dosya (Varsayılan: index.js veya main.py)</label>
+                            <label>Ana Dosya (VarsayÄ±lan: index.js veya main.py)</label>
                             <input type="text" id="up-main" placeholder="index.js" value="index.js">
                         </div>
                         <div class="form-group">
-                            <label>Proje Dosyası (.zip)</label>
+                            <label>Proje DosyasÄ± (.zip)</label>
                             <div class="file-upload-box" id="file-drop-area">
                                 <i class="fa-regular fa-file-zipper"></i>
-                                <p>Sürükle bırak veya <span>Dosya Seç</span></p>
+                                <p>SÃ¼rÃ¼kle bÄ±rak veya <span>Dosya SeÃ§</span></p>
                                 <input type="file" id="up-file" accept=".zip" required>
                             </div>
                             <div id="file-name-display"></div>
@@ -109,12 +116,12 @@
                         
                         <div id="upload-status" class="alert" style="display: none;"></div>
 
-                        <button type="submit" class="btn-primary btn-block" id="btn-upload">Yükle ve Başlat <i class="fa-solid fa-rocket"></i></button>
+                        <button type="submit" class="btn-primary btn-block" id="btn-upload">YÃ¼kle ve BaÅŸlat <i class="fa-solid fa-rocket"></i></button>
                     </form>
                 </div>
             </div>
 
-            <!-- Destek (Yapay Zeka) Görünümü -->
+            <!-- Destek (Yapay Zeka) GÃ¶rÃ¼nÃ¼mÃ¼ -->
             <div id="view-support" class="view">
                 <div class="header">
                     <h1><i class="fa-solid fa-robot"></i> Destek (Yapay Zeka)</h1>
@@ -123,27 +130,27 @@
                     <div class="chat-box" id="ai-chat-box">
                         <div class="chat-message ai-message">
                             <div class="avatar"><i class="fa-solid fa-robot"></i></div>
-                            <div class="bubble">Merhaba! Ben APEX Yapay Zeka asistanıyım. Hosting sistemimiz, bot kurulumları ve hatalar hakkında bana soru sorabilirsiniz. Nasıl yardımcı olabilirim?</div>
+                            <div class="bubble">Merhaba! Ben APEX Yapay Zeka asistanÄ±yÄ±m. Hosting sistemimiz, bot kurulumlarÄ± ve hatalar hakkÄ±nda bana soru sorabilirsiniz. NasÄ±l yardÄ±mcÄ± olabilirim?</div>
                         </div>
                     </div>
                     <div class="chat-input-area">
-                        <input type="text" id="ai-chat-input" placeholder="Sorunuzu buraya yazın..." onkeypress="if(event.key === 'Enter') sendAIMessage()">
-                        <button class="btn-primary" onclick="sendAIMessage()"><i class="fa-solid fa-paper-plane"></i> Gönder</button>
+                        <input type="text" id="ai-chat-input" placeholder="Sorunuzu buraya yazÄ±n..." onkeypress="if(event.key === 'Enter') sendAIMessage()">
+                        <button class="btn-primary" onclick="sendAIMessage()"><i class="fa-solid fa-paper-plane"></i> GÃ¶nder</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Proje Detay Görünümü (Editör & Konsol) -->
+            <!-- Proje Detay GÃ¶rÃ¼nÃ¼mÃ¼ (EditÃ¶r & Konsol) -->
             <div id="view-project-detail" class="view">
                 <div class="header">
                     <div class="back-nav" onclick="switchView('projects')"><i class="fa-solid fa-arrow-left"></i></div>
-                    <h1 id="detail-name">Proje Adı</h1>
+                    <h1 id="detail-name">Proje AdÄ±</h1>
                     <div class="status-badge" id="detail-status">Durum</div>
                 </div>
 
                 <div class="project-controls">
-                    <button class="btn-action success" id="btn-start" onclick="projectAction('start')"><i class="fa-solid fa-play"></i> Başlat</button>
-                    <button class="btn-action warning" id="btn-restart" onclick="projectAction('restart')"><i class="fa-solid fa-rotate-right"></i> Yeniden Başlat</button>
+                    <button class="btn-action success" id="btn-start" onclick="projectAction('start')"><i class="fa-solid fa-play"></i> BaÅŸlat</button>
+                    <button class="btn-action warning" id="btn-restart" onclick="projectAction('restart')"><i class="fa-solid fa-rotate-right"></i> Yeniden BaÅŸlat</button>
                     <button class="btn-action danger" id="btn-stop" onclick="projectAction('stop')"><i class="fa-solid fa-stop"></i> Durdur</button>
                     <span class="uptime" id="detail-uptime"><i class="fa-regular fa-clock"></i> 0s</span>
                     <button class="btn-action danger ml-auto" onclick="deleteProject()"><i class="fa-solid fa-trash"></i> Projeyi Sil</button>
@@ -188,16 +195,16 @@
 
                   <!-- SEKME: Dosyalar -->
                   <div id="ptab-files" class="ptab-content workspace" style="display:flex;">
-                      <!-- Dosya Yöneticisi -->
+                      <!-- Dosya YÃ¶neticisi -->
                       <div class="file-explorer">
                           <div class="panel-header">Dosyalar</div>
                           <div id="file-tree" class="file-tree"></div>
                       </div>
 
-                      <!-- Editör -->
+                      <!-- EditÃ¶r -->
                       <div class="code-editor-area">
                           <div class="panel-header flex-between">
-                              <span id="current-file-name">Bir dosya seçin...</span>
+                              <span id="current-file-name">Bir dosya seÃ§in...</span>
                               <button class="btn-small success" id="btn-save-file" disabled><i class="fa-solid fa-floppy-disk"></i> Kaydet (Auto-Restart)</button>
                           </div>
                           <textarea id="code-editor"></textarea>
@@ -208,7 +215,7 @@
                   <div id="ptab-console" class="ptab-content" style="display:none; flex:1; margin-top:1rem; min-height: 400px;">
                       <div class="terminal-area" style="height:100%;">
                           <div class="panel-header flex-between">
-                              <span><i class="fa-solid fa-terminal"></i> Canlı Konsol</span>
+                              <span><i class="fa-solid fa-terminal"></i> CanlÄ± Konsol</span>
                               <button class="btn-small" onclick="clearTerminal()"><i class="fa-solid fa-eraser"></i></button>
                           </div>
                           <div id="terminal-output" class="terminal-output"></div>
@@ -228,4 +235,5 @@
     <script src="/js/dashboard.js"></script>
 </body>
 </html>
+
 

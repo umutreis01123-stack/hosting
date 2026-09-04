@@ -1,4 +1,4 @@
-/* Owner CSS */
+﻿/* Owner CSS */
 .owner-layout {
     display: flex;
     flex-direction: column;
@@ -52,7 +52,7 @@
     grid-template-columns: 1fr 350px;
     gap: 1.5rem;
     padding: 2rem;
-    overflow: hidden;
+    overflow-y: auto;
 }
 
 .panel {
@@ -61,7 +61,7 @@
     border-radius: 12px;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow-y: auto;
 }
 
 .panel-header {
@@ -126,3 +126,4 @@
 .btn-primary.warning { background: var(--warning); color: black; }
 .btn-primary.danger { background: var(--danger); }
 .btn-small.danger { background: var(--danger); border:none; }
+

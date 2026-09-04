@@ -473,3 +473,22 @@ function addDnsRecord() {
 }
 
 
+
+// Bakim Modu Kontrolu
+async function checkMaintenance() {
+    try {
+        const res = await fetch('/api/maintenance');
+        const data = await res.json();
+        if (data.active) {
+            document.getElementById('maintenance-screen').style.display = 'flex';
+            document.getElementById('maintenance-reason').innerText = data.reason;
+            // Eger bakim modundaysa ve Kurucu degilse tum ekrani engelle (Owner ise altta devam edebilir, veya baska url)
+        } else {
+            document.getElementById('maintenance-screen').style.display = 'none';
+        }
+    } catch(e) {}
+}
+
+// Check every 30 seconds
+setInterval(checkMaintenance, 30000);
+document.addEventListener('DOMContentLoaded', checkMaintenance);

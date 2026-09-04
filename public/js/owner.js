@@ -221,12 +221,22 @@ async function quickAddCredit(userId) {
 
 
 async function triggerMaintenance() {
-    if(!confirm("BAKIM MODU: Sunucudaki TUM projeler kapatilacak. Emin misiniz?")) return;
+    const action = confirm('Bakim Modunu AKTIF etmek icin TAMAM, KAPATMAK icin IPTAL e basin.');
+    let reason = '';
+    if(action) {
+        reason = prompt('Bakim sebebi nedir? (Musterilere bu mesaj gosterilecek):');
+        if(reason === null) return;
+    }
     try {
-        const res = await fetch('/api/owner/maintenance', { method: 'POST' });
+        const res = await fetch('/api/owner/maintenance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ active: action, reason: reason })
+        });
         const data = await res.json();
         alert(data.message);
         fetchUsers();
         fetchStats();
     } catch(err) { alert('Islem basarisiz.'); }
 }
+
