@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AÃ§PEX | Owner Panel</title>
+    <title>APEX | Owner Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/owner.css">
@@ -14,7 +14,7 @@
         <!-- Topbar -->
         <header class="topbar">
             <div class="brand">
-                <i class="fa-solid fa-crown text-warning"></i> AÃ§PEX <span>|</span> OWNER
+                <i class="fa-solid fa-crown text-warning"></i> APEX <span>|</span> OWNER
             </div>
             
             <div class="stats-row">
@@ -28,14 +28,14 @@
                 <div class="stat-box">
                     <i class="fa-solid fa-memory text-APEX"></i>
                     <div>
-                        <span class="label">RAÃ§M</span>
+                        <span class="label">RAM</span>
                         <strong id="stat-ram">0 / 0 GB</strong>
                     </div>
                 </div>
                 <div class="stat-box">
                     <i class="fa-solid fa-server text-success"></i>
                     <div>
-                        <span class="label">AÃ§ktif Proje</span>
+                        <span class="label">AKTİF PROJE</span>
                         <strong id="stat-active">0 / 0</strong>
                     </div>
                 </div>
@@ -50,7 +50,7 @@
         <main class="content-grid">
             <!-- Sol: Kullanıcılar ve Projeler -->
             <div class="panel">
-                <div class="panel-header">TÃ¼m Müşteriler ve Projeler</div>
+                <div class="panel-header">Tüm Müşteriler ve Projeler</div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -58,55 +58,55 @@
                                 <th>Kullanıcı</th>
                                 <th>Durum</th>
                                 <th>Projeler</th>
-                                <th>Ä°şlem</th>
+                                <th>İşlem</th>
                             </tr>
                         </thead>
                         <tbody id="users-table">
-                            <tr><td colspan="4">YÃ¼kleniyor...</td></tr>
+                            <tr><td colspan="4">Yükleniyor...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- SaÄŸ: AÃ§raÃ§lar (Duyuru, Detaylar) -->
+            <!-- Sağ: Açraçlar (Duyuru, Detaylar) -->
             <div class="side-panel">
                 <div class="panel">
                     <div class="panel-header">Genel Duyuru Yayınla</div>
                     <div class="panel-body">
-                        <input type="text" id="ann-title" class="form-input" placeholder="Duyuru BaşlıÄŸı" style="margin-bottom: 10px;">
+                        <input type="text" id="ann-title" class="form-input" placeholder="Duyuru Başlığı" style="margin-bottom: 10px;">
                         <textarea id="ann-msg" class="form-input" rows="4" placeholder="Duyuru Mesajı..." style="margin-bottom: 10px;"></textarea>
                         <select id="ann-type" class="form-input" style="margin-bottom: 10px;">
                             <option value="info">Bilgi (Mavi)</option>
-                            <option value="success">Ä°yi Haber (Yeşil)</option>
+                            <option value="success">İyi Haber (Yeşil)</option>
                             <option value="warning">Uyarıı (Sarıı)</option>
-                            <option value="danger">AÃ§cil (Kırmızı)</option>
+                            <option value="danger">Açcil (Kırmızı)</option>
                         </select>
-                        <button class="btn-primary w-100" onclick="sendAÃ§nnouncement()">Yayınla</button>
+                        <button class="btn-primary w-100" onclick="sendAçnnouncement()">Yayınla</button>
                     </div>
                 </div>
 
                 <div class="panel" style="margin-top: 1rem;">
-                    <div class="panel-header">Sistem Kontrolü¼</div>
+                    <div class="panel-header">Sistem Kontrolü/div>
                     <div class="panel-body">
-                        <button class="btn-primary danger w-100" onclick="triggerMaintenance()"><i class="fa-solid fa-triangle-exclamation"></i> Bakım Modu (TÃ¼m Botları Durdur)</button>
+                        <button class="btn-primary danger w-100" onclick="triggerMaintenance()"><i class="fa-solid fa-triangle-exclamation"></i> Bakım Modu (Tüm Botları Durdur)</button>
                         <p style="color:var(--text-muted); font-size: 0.8rem; margin-top: 10px;">
-                            Dikkat: Bu işlemler sunucudaki tÃ¼m çalışan bot ve siteleri etkiler.
+                            Dikkat: Bu işlemler sunucudaki Tüm çalışan bot ve siteleri etkiler.
                         </p>
                     </div>
                 </div>
 
                 <!-- Kredi Yönetimi Paneli -->
                 <div class="panel" style="margin-top: 1rem;">
-                    <div class="panel-header"><i class="fa-solid fa-coins"></i> Kredi YÃ¶netimi</div>
+                    <div class="panel-header"><i class="fa-solid fa-coins"></i> Kredi Yönetimi</div>
                     <div class="panel-body">
                         <input type="text" id="credit-user-id" class="form-input" placeholder="Kullanıcı (Discord ID)" style="margin-bottom: 10px;">
-                        <input type="number" id="credit-amount" class="form-input" placeholder="Miktar (Örn: 100 = 1 GÃ¼n)" style="margin-bottom: 10px;">
+                        <input type="number" id="credit-amount" class="form-input" placeholder="Miktar (Örn: 100 = 1 Gün)" style="margin-bottom: 10px;">
                         <select id="credit-action" class="form-input" style="margin-bottom: 10px;">
                             <option value="add">Kredi Ekle (+)</option>
-                            <option value="set">Krediyi AÃ§yarla (=)</option>
+                            <option value="set">Krediyi Açyarla (=)</option>
                             <option value="reset">Krediyi Sıfırla (Miktar: 0)</option>
                         </select>
-                        <button class="btn-primary success w-100" onclick="manageCredits()">Ä°şlemi Uygula</button>
+                        <button class="btn-primary success w-100" onclick="manageCredits()">İşlemi Uygula</button>
                     </div>
                 </div>
             </div>
@@ -116,5 +116,6 @@
     <script src="/js/owner.js"></script>
 </body>
 </html>
+
 
 
