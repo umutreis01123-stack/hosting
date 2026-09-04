@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AçPEX | Owner Panel</title>
+    <title>AÃ§PEX | Owner Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/owner.css">
@@ -14,7 +14,7 @@
         <!-- Topbar -->
         <header class="topbar">
             <div class="brand">
-                <i class="fa-solid fa-crown text-warning"></i> AçPEX <span>|</span> OWNER
+                <i class="fa-solid fa-crown text-warning"></i> AÃ§PEX <span>|</span> OWNER
             </div>
             
             <div class="stats-row">
@@ -26,87 +26,87 @@
                     </div>
                 </div>
                 <div class="stat-box">
-                    <i class="fa-solid fa-memory text-apex"></i>
+                    <i class="fa-solid fa-memory text-APEX"></i>
                     <div>
-                        <span class="label">RAçM</span>
+                        <span class="label">RAÃ§M</span>
                         <strong id="stat-ram">0 / 0 GB</strong>
                     </div>
                 </div>
                 <div class="stat-box">
                     <i class="fa-solid fa-server text-success"></i>
                     <div>
-                        <span class="label">Açktif Proje</span>
+                        <span class="label">AÃ§ktif Proje</span>
                         <strong id="stat-active">0 / 0</strong>
                     </div>
                 </div>
             </div>
 
             <div>
-                <a href="/dashboard" class="btn-small"><i class="fa-solid fa-users"></i> Müşteri Paneline Dön</a>
-                <a href="/auth/logout" class="btn-small danger" style="margin-left: 10px;"><i class="fa-solid fa-power-off"></i> Çıkış</a>
+                <a href="/dashboard" class="btn-small"><i class="fa-solid fa-users"></i> MÃ¼ÅŸteri Paneline DÃ¶n</a>
+                <a href="/auth/logout" class="btn-small danger" style="margin-left: 10px;"><i class="fa-solid fa-power-off"></i> Ã‡Ä±kÄ±ÅŸ</a>
             </div>
         </header>
 
         <main class="content-grid">
-            <!-- Sol: Kullanıcılar ve Projeler -->
+            <!-- Sol: KullanÄ±cÄ±lar ve Projeler -->
             <div class="panel">
-                <div class="panel-header">Tüm Müşteriler ve Projeler</div>
+                <div class="panel-header">TÃ¼m MÃ¼ÅŸteriler ve Projeler</div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Kullanıcı</th>
+                                <th>KullanÄ±cÄ±</th>
                                 <th>Durum</th>
                                 <th>Projeler</th>
-                                <th>İşlem</th>
+                                <th>Ä°ÅŸlem</th>
                             </tr>
                         </thead>
                         <tbody id="users-table">
-                            <tr><td colspan="4">Yükleniyor...</td></tr>
+                            <tr><td colspan="4">YÃ¼kleniyor...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Sağ: Açraçlar (Duyuru, Detaylar) -->
+            <!-- SaÄŸ: AÃ§raÃ§lar (Duyuru, Detaylar) -->
             <div class="side-panel">
                 <div class="panel">
-                    <div class="panel-header">Genel Duyuru Yayınla</div>
+                    <div class="panel-header">Genel Duyuru YayÄ±nla</div>
                     <div class="panel-body">
-                        <input type="text" id="ann-title" class="form-input" placeholder="Duyuru Başlığı" style="margin-bottom: 10px;">
-                        <textarea id="ann-msg" class="form-input" rows="4" placeholder="Duyuru Mesajı..." style="margin-bottom: 10px;"></textarea>
+                        <input type="text" id="ann-title" class="form-input" placeholder="Duyuru BaÅŸlÄ±ÄŸÄ±" style="margin-bottom: 10px;">
+                        <textarea id="ann-msg" class="form-input" rows="4" placeholder="Duyuru MesajÄ±..." style="margin-bottom: 10px;"></textarea>
                         <select id="ann-type" class="form-input" style="margin-bottom: 10px;">
                             <option value="info">Bilgi (Mavi)</option>
-                            <option value="success">İİyi Haber (Yeşil)</option>
-                            <option value="warning">Uyarıı (Sarıı)</option>
-                            <option value="danger">Açcil (Kırmızı)</option>
+                            <option value="success">Ä°yi Haber (YeÅŸil)</option>
+                            <option value="warning">UyarÄ±Ä± (SarÄ±Ä±)</option>
+                            <option value="danger">AÃ§cil (KÄ±rmÄ±zÄ±)</option>
                         </select>
-                        <button class="btn-primary w-100" onclick="sendAçnnouncement()">Yayınla</button>
+                        <button class="btn-primary w-100" onclick="sendAÃ§nnouncement()">YayÄ±nla</button>
                     </div>
                 </div>
 
                 <div class="panel" style="margin-top: 1rem;">
-                    <div class="panel-header">Sistem Kontrolü</div>
+                    <div class="panel-header">Sistem KontrolÃ¼</div>
                     <div class="panel-body">
-                        <button class="btn-primary danger w-100" onclick="triggerMaintenance()"><i class="fa-solid fa-triangle-exclamation"></i> Bakım Modu (Tüm Botları Durdur)</button>
+                        <button class="btn-primary danger w-100" onclick="triggerMaintenance()"><i class="fa-solid fa-triangle-exclamation"></i> BakÄ±m Modu (TÃ¼m BotlarÄ± Durdur)</button>
                         <p style="color:var(--text-muted); font-size: 0.8rem; margin-top: 10px;">
-                            Dikkat: Bu işlemler sunucudaki tüm çalışan bot ve siteleri etkiler.
+                            Dikkat: Bu iÅŸlemler sunucudaki tÃ¼m Ã§alÄ±ÅŸan bot ve siteleri etkiler.
                         </p>
                     </div>
                 </div>
 
                 <!-- Kredi Yonetimi Paneli -->
                 <div class="panel" style="margin-top: 1rem;">
-                    <div class="panel-header"><i class="fa-solid fa-coins"></i> Kredi Yönetimi</div>
+                    <div class="panel-header"><i class="fa-solid fa-coins"></i> Kredi YÃ¶netimi</div>
                     <div class="panel-body">
-                        <input type="text" id="credit-user-id" class="form-input" placeholder="Kullanıcı (Discord ID)" style="margin-bottom: 10px;">
-                        <input type="number" id="credit-amount" class="form-input" placeholder="Miktar (Örn: 100 = 1 Gün)" style="margin-bottom: 10px;">
+                        <input type="text" id="credit-user-id" class="form-input" placeholder="KullanÄ±cÄ± (Discord ID)" style="margin-bottom: 10px;">
+                        <input type="number" id="credit-amount" class="form-input" placeholder="Miktar (Ã–rn: 100 = 1 GÃ¼n)" style="margin-bottom: 10px;">
                         <select id="credit-action" class="form-input" style="margin-bottom: 10px;">
                             <option value="add">Kredi Ekle (+)</option>
-                            <option value="set">Krediİyi Açyarla (=)</option>
-                            <option value="reset">Krediİyi Sıfırla (Miktar: 0)</option>
+                            <option value="set">Krediyi AÃ§yarla (=)</option>
+                            <option value="reset">Krediyi SÄ±fÄ±rla (Miktar: 0)</option>
                         </select>
-                        <button class="btn-primary success w-100" onclick="manageCredits()">İşlemi Uygula</button>
+                        <button class="btn-primary success w-100" onclick="manageCredits()">Ä°ÅŸlemi Uygula</button>
                     </div>
                 </div>
             </div>
@@ -116,3 +116,4 @@
     <script src="/js/owner.js"></script>
 </body>
 </html>
+
