@@ -88,8 +88,7 @@
                 <div class="panel" style="margin-top: 1rem;">
                     <div class="panel-header">Sistem Kontrolü</div>
                     <div class="panel-body">
-                        <button class="btn-primary warning w-100" style="margin-bottom: 10px;"><i class="fa-solid fa-rotate"></i> Tüm Projeleri Yeniden Başlat</button>
-                        <button class="btn-primary danger w-100"><i class="fa-solid fa-triangle-exclamation"></i> Acil Durdurma (Kill All)</button>
+                        <button class="btn-primary danger w-100" onclick="triggerMaintenance()"><i class="fa-solid fa-triangle-exclamation"></i> Bakım Modu (Tüm Botları Durdur)</button>
                         <p style="color:var(--text-muted); font-size: 0.8rem; margin-top: 10px;">
                             Dikkat: Bu işlemler sunucudaki tüm çalışan bot ve siteleri etkiler.
                         </p>
@@ -104,7 +103,8 @@
                         <input type="number" id="credit-amount" class="form-input" placeholder="Miktar (Örn: 100 = 1 Gün)" style="margin-bottom: 10px;">
                         <select id="credit-action" class="form-input" style="margin-bottom: 10px;">
                             <option value="add">Kredi Ekle (+)</option>
-                            <option value="set">Kredi Ayarla (=)</option>
+                            <option value="set">Krediyi Ayarla (=)</option>
+                            <option value="reset">Krediyi Sıfırla (Miktar: 0)</option>
                         </select>
                         <button class="btn-primary success w-100" onclick="manageCredits()">İşlemi Uygula</button>
                     </div>

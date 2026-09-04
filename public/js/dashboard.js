@@ -1,4 +1,4 @@
-// State
+﻿// State
 let currentUser = null;
 let currentProject = null;
 let editor = null;
@@ -285,7 +285,9 @@ document.getElementById('btn-save-file')?.addEventListener('click', async () => 
 });
 
 // Yeni Yukle
-const uploadForm = document.getElementById('upload-form');
+const uploadForm = document.getElementById('up-type').addEventListener('change', (e) => { document.getElementById('up-main').value = e.target.value === 'python' ? 'main.py' : 'index.js'; });
+
+document.getElementById('upload-form');
 const upFile = document.getElementById('up-file');
 const fileDrop = document.getElementById('file-drop-area');
 const fileDisplay = document.getElementById('file-name-display');
@@ -469,4 +471,5 @@ function addDnsRecord() {
         }
     });
 }
+
 

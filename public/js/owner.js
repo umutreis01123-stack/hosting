@@ -1,6 +1,6 @@
-document.addEventListener('DOMContentLoaded', () => {
+﻿document.addEventListener('DOMContentLoaded', () => {
     checkOwnerAuth();
-    setInterval(fetchStats, 5000); // Her 5 saniyede bir stats gÃ¼ncelle
+    setInterval(fetchStats, 5000); // Her 5 saniyede bir stats gÃƒÂ¼ncelle
 });
 
 async function checkOwnerAuth() {
@@ -55,7 +55,7 @@ function renderUsers(users) {
     const tbody = document.getElementById('users-table');
     
     if (users.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">HenÃ¼z kullanÄ±cÄ± yok</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">HenÃƒÂ¼z kullanÃ„Â±cÃ„Â± yok</td></tr>';
         return;
     }
 
@@ -73,7 +73,7 @@ function renderUsers(users) {
             </td>
             <td>
                 ${user.banned 
-                    ? '<span class="status-badge status-stopped">BanlÄ±</span>' 
+                    ? '<span class="status-badge status-stopped">BanlÃ„Â±</span>' 
                     : '<span class="status-badge status-running">Aktif</span>'}
             </td>
             <td>
@@ -93,7 +93,7 @@ function renderUsers(users) {
             </td>
             <td>
                 <button class="btn-small ${user.banned ? 'success' : 'danger'}" onclick="toggleBan('${user.id}', ${!user.banned})" style="width:100%;">
-                    <i class="fa-solid fa-gavel"></i> ${user.banned ? 'Banı Aç' : 'Banla'}
+                    <i class="fa-solid fa-gavel"></i> ${user.banned ? 'BanÄ± AÃ§' : 'Banla'}
                 </button>
                 <button class="btn-small warning" onclick="quickAddCredit('${user.id}')" style="width:100%; margin-top:5px; color:#000;">
                     <i class="fa-solid fa-coins"></i> Kredi Ekle
@@ -110,21 +110,21 @@ async function forceProjectAction(projectId, action) {
         alert(data.message);
         fetchUsers();
         fetchStats();
-    } catch(err) { alert('Hata oluÅŸtu'); }
+    } catch(err) { alert('Hata oluÃ…Å¸tu'); }
 }
 
 async function forceProjectDelete(projectId) {
-    if(!confirm("KullanÄ±cÄ±nÄ±n projesini kalÄ±cÄ± olarak silmek Ã¼zeresiniz. Emin misiniz?")) return;
+    if(!confirm("KullanÃ„Â±cÃ„Â±nÃ„Â±n projesini kalÃ„Â±cÃ„Â± olarak silmek ÃƒÂ¼zeresiniz. Emin misiniz?")) return;
     try {
         const res = await fetch(`/api/owner/project/${projectId}`, { method: 'DELETE' });
         const data = await res.json();
         alert(data.message);
         fetchUsers();
-    } catch(err) { alert('Hata oluÅŸtu'); }
+    } catch(err) { alert('Hata oluÃ…Å¸tu'); }
 }
 
 async function toggleBan(userId, banStatus) {
-    if(!confirm(`KullanÄ±cÄ±yÄ± ${banStatus ? 'banlamak' : 'yasaÄŸÄ±nÄ± kaldÄ±rmak'} istediÄŸinize emin misiniz?`)) return;
+    if(!confirm(`KullanÃ„Â±cÃ„Â±yÃ„Â± ${banStatus ? 'banlamak' : 'yasaÃ„Å¸Ã„Â±nÃ„Â± kaldÃ„Â±rmak'} istediÃ„Å¸inize emin misiniz?`)) return;
     try {
         const res = await fetch(`/api/owner/ban/${userId}`, {
             method: 'POST',
@@ -134,7 +134,7 @@ async function toggleBan(userId, banStatus) {
         const data = await res.json();
         alert(data.message);
         fetchUsers();
-    } catch(err) { alert('Hata oluÅŸtu'); }
+    } catch(err) { alert('Hata oluÃ…Å¸tu'); }
 }
 
 async function sendAnnouncement() {
@@ -142,7 +142,7 @@ async function sendAnnouncement() {
     const message = document.getElementById('ann-msg').value;
     const type = document.getElementById('ann-type').value;
 
-    if(!title || !message) return alert('BaÅŸlÄ±k ve mesaj girin');
+    if(!title || !message) return alert('BaÃ…Å¸lÃ„Â±k ve mesaj girin');
 
     try {
         const res = await fetch('/api/owner/announce', {
@@ -152,17 +152,22 @@ async function sendAnnouncement() {
         });
         const data = await res.json();
         if(data.success) {
-            alert('Duyuru yayÄ±nlandÄ±!');
+            alert('Duyuru yayÃ„Â±nlandÃ„Â±!');
             document.getElementById('ann-title').value = '';
             document.getElementById('ann-msg').value = '';
         }
-    } catch(err) { alert('Duyuru gÃ¶nderilemedi'); }
+    } catch(err) { alert('Duyuru gÃƒÂ¶nderilemedi'); }
 }
 
 async function manageCredits() {
     const userId = document.getElementById('credit-user-id').value.trim();
     const amount = document.getElementById('credit-amount').value;
-    const action = document.getElementById('credit-action').value;
+        let action = document.getElementById('credit-action').value;
+    let finalAmount = amount;
+    if (action === 'reset') {
+        action = 'set';
+        finalAmount = 0;
+    }
 
     if(!userId || !amount) {
         alert('Lutfen Kullanici ID ve Miktar giriniz.');
@@ -173,7 +178,7 @@ async function manageCredits() {
         const res = await fetch('/api/owner/credits/' + userId, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ amount: Number(amount), action: action })
+            body: JSON.stringify({ amount: Number(finalAmount), action: action })
         });
         const data = await res.json();
         
@@ -198,7 +203,7 @@ async function quickAddCredit(userId) {
         const res = await fetch('/api/owner/credits/' + userId, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ amount: Number(amount), action: 'add' })
+            body: JSON.stringify({ amount: Number(finalAmount), action: 'add' })
         });
         const data = await res.json();
         
@@ -211,4 +216,17 @@ async function quickAddCredit(userId) {
     } catch(err) { 
         alert('Kredi gonderilemedi.');
     }
+}
+
+
+
+async function triggerMaintenance() {
+    if(!confirm("BAKIM MODU: Sunucudaki TUM projeler kapatilacak. Emin misiniz?")) return;
+    try {
+        const res = await fetch('/api/owner/maintenance', { method: 'POST' });
+        const data = await res.json();
+        alert(data.message);
+        fetchUsers();
+        fetchStats();
+    } catch(err) { alert('Islem basarisiz.'); }
 }

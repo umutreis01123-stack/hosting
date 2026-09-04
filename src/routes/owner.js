@@ -126,4 +126,24 @@ router.post('/announce', (req, res) => {
 function getJsonData(filePath) { try { return JSON.parse(fs.readFileSync(filePath, 'utf8')); } catch (e) { return filePath.includes('[]') ? [] : {}; } }
 function saveJsonData(filePath, data) { fs.writeFileSync(filePath, JSON.stringify(data, null, 2)); }
 
+/**
+ * POST /api/owner/maintenance
+ * Tum aktif projeleri durdurur (Bakim Modu)
+ */
+router.post('/maintenance', async (req, res) => {
+    try {
+        const processManager = require('../utils/processManager');
+        const running = processManager.getRunningProjects();
+        let killedCount = 0;
+        for (const rp of running) {
+            await processManager.stopProject(rp.projectId);
+            killedCount++;
+        }
+        res.json({ success: true, message: Bakim Modu aktif! Toplam  proje basariyla durduruldu. });
+    } catch(err) {
+        res.status(500).json({ success: false, message: 'Durdurma islemi başarisiz oldu.' });
+    }
+});
+
 module.exports = router;
+
