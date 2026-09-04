@@ -93,7 +93,7 @@ function renderUsers(users) {
             </td>
             <td>
                 <button class="btn-small ${user.banned ? 'success' : 'danger'}" onclick="toggleBan('${user.id}', ${!user.banned})" style="width:100%;">
-                    <i class="fa-solid fa-gavel"></i> ${user.banned ? 'BanÄ± AÃ§' : 'Banla'}
+                    <i class="fa-solid fa-gavel"></i> ${user.banned ? 'Banı AÃ§' : 'Banla'}
                 </button>
                 <button class="btn-small warning" onclick="quickAddCredit('${user.id}')" style="width:100%; margin-top:5px; color:#000;">
                     <i class="fa-solid fa-coins"></i> Kredi Ekle

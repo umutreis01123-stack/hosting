@@ -42,23 +42,23 @@
             </div>
 
             <div>
-                <a href="/dashboard" class="btn-small"><i class="fa-solid fa-users"></i> MÃ¼ÅŸteri Paneline DÃ¶n</a>
-                <a href="/auth/logout" class="btn-small danger" style="margin-left: 10px;"><i class="fa-solid fa-power-off"></i> Ã‡Ä±kÄ±ÅŸ</a>
+                <a href="/dashboard" class="btn-small"><i class="fa-solid fa-users"></i> Müşteri Paneline Dön</a>
+                <a href="/auth/logout" class="btn-small danger" style="margin-left: 10px;"><i class="fa-solid fa-power-off"></i> Çıkış</a>
             </div>
         </header>
 
         <main class="content-grid">
-            <!-- Sol: KullanÄ±cÄ±lar ve Projeler -->
+            <!-- Sol: Kullanıcılar ve Projeler -->
             <div class="panel">
-                <div class="panel-header">TÃ¼m MÃ¼ÅŸteriler ve Projeler</div>
+                <div class="panel-header">TÃ¼m Müşteriler ve Projeler</div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>KullanÄ±cÄ±</th>
+                                <th>Kullanıcı</th>
                                 <th>Durum</th>
                                 <th>Projeler</th>
-                                <th>Ä°ÅŸlem</th>
+                                <th>Ä°şlem</th>
                             </tr>
                         </thead>
                         <tbody id="users-table">
@@ -71,42 +71,42 @@
             <!-- SaÄŸ: AÃ§raÃ§lar (Duyuru, Detaylar) -->
             <div class="side-panel">
                 <div class="panel">
-                    <div class="panel-header">Genel Duyuru YayÄ±nla</div>
+                    <div class="panel-header">Genel Duyuru Yayınla</div>
                     <div class="panel-body">
-                        <input type="text" id="ann-title" class="form-input" placeholder="Duyuru BaÅŸlÄ±ÄŸÄ±" style="margin-bottom: 10px;">
-                        <textarea id="ann-msg" class="form-input" rows="4" placeholder="Duyuru MesajÄ±..." style="margin-bottom: 10px;"></textarea>
+                        <input type="text" id="ann-title" class="form-input" placeholder="Duyuru BaşlıÄŸı" style="margin-bottom: 10px;">
+                        <textarea id="ann-msg" class="form-input" rows="4" placeholder="Duyuru Mesajı..." style="margin-bottom: 10px;"></textarea>
                         <select id="ann-type" class="form-input" style="margin-bottom: 10px;">
                             <option value="info">Bilgi (Mavi)</option>
-                            <option value="success">Ä°yi Haber (YeÅŸil)</option>
-                            <option value="warning">UyarÄ±Ä± (SarÄ±Ä±)</option>
-                            <option value="danger">AÃ§cil (KÄ±rmÄ±zÄ±)</option>
+                            <option value="success">Ä°yi Haber (Yeşil)</option>
+                            <option value="warning">Uyarıı (Sarıı)</option>
+                            <option value="danger">AÃ§cil (Kırmızı)</option>
                         </select>
-                        <button class="btn-primary w-100" onclick="sendAÃ§nnouncement()">YayÄ±nla</button>
+                        <button class="btn-primary w-100" onclick="sendAÃ§nnouncement()">Yayınla</button>
                     </div>
                 </div>
 
                 <div class="panel" style="margin-top: 1rem;">
-                    <div class="panel-header">Sistem KontrolÃ¼</div>
+                    <div class="panel-header">Sistem Kontrolü¼</div>
                     <div class="panel-body">
-                        <button class="btn-primary danger w-100" onclick="triggerMaintenance()"><i class="fa-solid fa-triangle-exclamation"></i> BakÄ±m Modu (TÃ¼m BotlarÄ± Durdur)</button>
+                        <button class="btn-primary danger w-100" onclick="triggerMaintenance()"><i class="fa-solid fa-triangle-exclamation"></i> Bakım Modu (TÃ¼m Botları Durdur)</button>
                         <p style="color:var(--text-muted); font-size: 0.8rem; margin-top: 10px;">
-                            Dikkat: Bu iÅŸlemler sunucudaki tÃ¼m Ã§alÄ±ÅŸan bot ve siteleri etkiler.
+                            Dikkat: Bu işlemler sunucudaki tÃ¼m çalışan bot ve siteleri etkiler.
                         </p>
                     </div>
                 </div>
 
-                <!-- Kredi Yonetimi Paneli -->
+                <!-- Kredi Yönetimi Paneli -->
                 <div class="panel" style="margin-top: 1rem;">
                     <div class="panel-header"><i class="fa-solid fa-coins"></i> Kredi YÃ¶netimi</div>
                     <div class="panel-body">
-                        <input type="text" id="credit-user-id" class="form-input" placeholder="KullanÄ±cÄ± (Discord ID)" style="margin-bottom: 10px;">
-                        <input type="number" id="credit-amount" class="form-input" placeholder="Miktar (Ã–rn: 100 = 1 GÃ¼n)" style="margin-bottom: 10px;">
+                        <input type="text" id="credit-user-id" class="form-input" placeholder="Kullanıcı (Discord ID)" style="margin-bottom: 10px;">
+                        <input type="number" id="credit-amount" class="form-input" placeholder="Miktar (Örn: 100 = 1 GÃ¼n)" style="margin-bottom: 10px;">
                         <select id="credit-action" class="form-input" style="margin-bottom: 10px;">
                             <option value="add">Kredi Ekle (+)</option>
                             <option value="set">Krediyi AÃ§yarla (=)</option>
-                            <option value="reset">Krediyi SÄ±fÄ±rla (Miktar: 0)</option>
+                            <option value="reset">Krediyi Sıfırla (Miktar: 0)</option>
                         </select>
-                        <button class="btn-primary success w-100" onclick="manageCredits()">Ä°ÅŸlemi Uygula</button>
+                        <button class="btn-primary success w-100" onclick="manageCredits()">Ä°şlemi Uygula</button>
                     </div>
                 </div>
             </div>
@@ -116,4 +116,5 @@
     <script src="/js/owner.js"></script>
 </body>
 </html>
+
 

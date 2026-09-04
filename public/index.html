@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AçPEX | Hosting</title>
+    <title>AÃ§PEX | Hosting</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,58 +11,58 @@
 <body class="landing-body">
     <div class="landing-container">
         <div class="logo">
-            <h1>AçPEX <span>|</span> HOSTING</h1>
+            <h1>AÃ§PEX <span>|</span> HOSTING</h1>
         </div>
         
         <div class="hero-text">
             <h2>Yeni Nesil Bot & Web Hosting</h2>
-            <p>Saniyesinde kur, yönet ve otomatik başlat. Discord OAçuth2 ile anında giriş yap.</p>
+            <p>Saniyesinde kur, yÃ¶net ve otomatik baÅŸlat. Discord OAÃ§uth2 ile anÄ±nda giriÅŸ yap.</p>
         </div>
 
         <div id="error-message" class="error-msg" style="display: none;"></div>
 
         <a href="/auth/discord" class="btn-discord">
-            <i class="fa-brands fa-discord"></i> Discord ile Giriş Yap
+            <i class="fa-brands fa-discord"></i> Discord ile GiriÅŸ Yap
         </a>
 
         <div class="features">
             <div class="feature">
                 <i class="fa-solid fa-bolt"></i>
-                <h3>Açnında Kurulum</h3>
-                <p>.zip yükle ve saniyeler içinde başlasın</p>
+                <h3>AÃ§nÄ±nda Kurulum</h3>
+                <p>.zip yÃ¼kle ve saniyeler iÃ§inde baÅŸlasÄ±n</p>
             </div>
             <div class="feature">
                 <i class="fa-solid fa-code"></i>
-                <h3>Canlıı Editör</h3>
-                <p>Web üzerinden kodunu düzenle, kaydet ve Açuto-Restart ile anında yenilensin</p>
+                <h3>CanlÄ±Ä± EditÃ¶r</h3>
+                <p>Web Ã¼zerinden kodunu dÃ¼zenle, kaydet ve AÃ§uto-Restart ile anÄ±nda yenilensin</p>
             </div>
             <div class="feature">
                 <i class="fa-solid fa-terminal"></i>
-                <h3>Canlıı Konsol</h3>
-                <p>Botunun loglarını saniyesi saniyesine panelinden izle</p>
+                <h3>CanlÄ±Ä± Konsol</h3>
+                <p>Botunun loglarÄ±nÄ± saniyesi saniyesine panelinden izle</p>
             </div>
         </div>
     </div>
 
     <script>
-        // URL'den hata mesajlarını al
-        const urlParams = new URLSeçarchParams(window.location.search);
+        // URL'den hata mesajlarÄ±nÄ± al
+        const urlParams = new URLSeÃ§archParams(window.location.search);
         const error = urlParams.get('error');
         if (error) {
             const errorDiv = document.getElementById('error-message');
             errorDiv.style.display = 'block';
             
             const errorMap = {
-                'login_required': 'Bu sayfayı görmek için giriş yapmalısınız.',
+                'login_required': 'Bu sayfayÄ± gÃ¶rmek iÃ§in giriÅŸ yapmalÄ±sÄ±nÄ±z.',
                 'discord_auth_denied': 'Discord yetkilendirmesi reddedildi.',
-                'auth_failed': 'Giriş işlemi başarısız oldu. Lütfen tekrar deneyin.',
-                'missing_discord_config': 'Sistem yapılandırma hatası: Discord ayarları eksik.'
+                'auth_failed': 'GiriÅŸ iÅŸlemi baÅŸarÄ±sÄ±z oldu. LÃ¼tfen tekrar deneyin.',
+                'missing_discord_config': 'Sistem yapÄ±landÄ±rma hatasÄ±: Discord ayarlarÄ± eksik.'
             };
             
-            errorDiv.textContent = errorMap[error] || 'Bir hata oluştu.';
+            errorDiv.textContent = errorMap[error] || 'Bir hata oluÅŸtu.';
         }
 
-        // Oturum açık mı kontrol et
+        // Oturum aÃ§Ä±k mÄ± kontrol et
         fetch('/auth/me').then(res => res.json()).then(data => {
             if (data.loggedIn) {
                 window.location.href = '/dashboard';
@@ -71,3 +71,4 @@
     </script>
 </body>
 </html>
+
