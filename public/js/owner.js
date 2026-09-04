@@ -203,7 +203,7 @@ async function quickAddCredit(userId) {
         const res = await fetch('/api/owner/credits/' + userId, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ amount: Number(finalAmount), action: 'add' })
+            body: JSON.stringify({ amount: Number(amount), action: 'add' })
         });
         const data = await res.json();
         
@@ -239,4 +239,5 @@ async function triggerMaintenance() {
         fetchStats();
     } catch(err) { alert('Islem basarisiz.'); }
 }
+
 
