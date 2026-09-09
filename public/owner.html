@@ -68,6 +68,31 @@
                 </div>
             </div>
 
+            <div class="panel" style="margin-top: 1.5rem;">
+                <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fa-solid fa-cube" style="color: #50fa7b;"></i> Aktif Minecraft Botları</span>
+                    <button onclick="fetchMCBots()" style="background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: #fff; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem;">
+                        <i class="fa-solid fa-rotate"></i> Yenile
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Kullanıcı (ID)</th>
+                                <th>Bot Adı</th>
+                                <th>Hedef Sunucu</th>
+                                <th>Durum / Eylem</th>
+                                <th>İşlem (Müdahale)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mc-bots-table">
+                            <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Yükleniyor...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- Sağ: Açraçlar (Duyuru, Detaylar) -->
             <div class="side-panel">
                 <div class="panel">
@@ -116,6 +141,7 @@
     <script src="/js/owner.js"></script>
 </body>
 </html>
+
 
 
 

@@ -43,6 +43,7 @@
             <nav class="menu" id="main-menu">
                 <a href="#" class="active" data-view="projects"><i class="fa-solid fa-server"></i> Projelerim</a>
                 <a href="#" data-view="upload"><i class="fa-solid fa-cloud-arrow-up"></i> Yeni Yükle</a>
+                <a href="#" data-view="mcbot"><i class="fa-solid fa-cube"></i> Minecraft Bot</a>
                 <a href="#" data-view="support"><i class="fa-solid fa-robot"></i> Destek (Yapay Zeka)</a>
                 <a href="/owner" id="nav-owner-link" style="display: none; color: #ffb86c; font-weight: bold; margin-top: auto;"><i class="fa-solid fa-crown"></i> Kurucu Paneli</a>
             </nav>
@@ -141,6 +142,81 @@
             </div>
 
             <!-- Proje Detay Görünümü (Editör & Konsol) -->
+                        <!-- Minecraft Bot Gorunumu -->
+            <div id="view-mcbot" class="view">
+                <div class="header">
+                    <h1><i class="fa-solid fa-cube" style="color: #50fa7b;"></i> Minecraft Sunucu Botu</h1>
+                    <div class="status-badge" id="mcbot-status-badge" style="background: rgba(255,255,255,0.05); color: var(--text-muted);">Bağlantı Yok</div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 340px 1fr; gap: 1.5rem; margin-top: 1rem;">
+                    <!-- Sol Panel: Baglanti Ayarlari -->
+                    <div class="card" style="background: var(--bg-card); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); height: fit-content;">
+                        <h3 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; font-size: 1.1rem;">
+                            <i class="fa-solid fa-plug" style="color:#ffb86c;"></i> Sunucu Bilgileri
+                        </h3>
+                        
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.85rem;">Sunucu IP Adresi</label>
+                            <input type="text" id="mc-host" placeholder="Örn: oyna.sunucum.com" style="width: 100%; padding: 0.75rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 8px; color: #fff;">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.85rem;">Port (Varsayılan: 25565)</label>
+                            <input type="number" id="mc-port" value="25565" style="width: 100%; padding: 0.75rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 8px; color: #fff;">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 1.25rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.85rem;">Bot İsmi (Opsiyonel)</label>
+                            <input type="text" id="mc-username" placeholder="Boş ise: Apex_1234" style="width: 100%; padding: 0.75rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 8px; color: #fff;">
+                            <small style="color: var(--text-muted); font-size: 0.75rem; display: block; margin-top: 4px;">⚡ Sürüm otomatik algılanır.</small>
+                        </div>
+
+                        <div style="display: flex; gap: 0.75rem;">
+                            <button class="btn-primary" id="btn-mc-connect" onclick="spawnMCBot()" style="flex: 1;">
+                                <i class="fa-solid fa-rocket"></i> Botu Sok
+                            </button>
+                            <button id="btn-mc-disconnect" onclick="stopMCBot()" style="flex: 1; display: none; background: var(--danger); border: none; padding: 0.75rem; border-radius: 8px; color: #fff; cursor: pointer; font-weight: 600;">
+                                <i class="fa-solid fa-power-off"></i> Çıkar
+                            </button>
+                        </div>
+
+                        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                            <h4 style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">HIZLI KOMUTLAR</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                <button type="button" onclick="quickMCCommand('yardım')" style="background: rgba(255,255,255,0.08); padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); color: #fff; cursor: pointer; font-size: 0.8rem;">📖 yardım</button>
+                                <button type="button" onclick="quickMCCommand('gez')" style="background: rgba(80,250,123,0.15); color: #50fa7b; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(80,250,123,0.3); cursor: pointer; font-size: 0.8rem;">🚶 gez</button>
+                                <button type="button" onclick="quickMCCommand('dur')" style="background: rgba(255,85,85,0.15); color: #ff5555; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,85,85,0.3); cursor: pointer; font-size: 0.8rem;">🛑 dur</button>
+                                <button type="button" onclick="quickMCCommand('takip et')" style="background: rgba(189,147,249,0.15); color: #bd93f9; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(189,147,249,0.3); cursor: pointer; font-size: 0.8rem;">🏃 takip et</button>
+                                <button type="button" onclick="quickMCPrompt('kaz')" style="background: rgba(255,184,108,0.15); color: #ffb86c; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,184,108,0.3); cursor: pointer; font-size: 0.8rem;">⛏️ kaz ...</button>
+                                <button type="button" onclick="quickMCPrompt('mesaj yaz')" style="background: rgba(139,233,253,0.15); color: #8be9fd; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(139,233,253,0.3); cursor: pointer; font-size: 0.8rem;">💬 mesaj yaz ...</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sag Panel: Bot Canli Konsol -->
+                    <div class="card" style="background: var(--bg-card); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-terminal" style="color: var(--primary);"></i>
+                                <span style="font-weight: 600;">Bot Canlı Konsolu</span>
+                                <span id="mcbot-action-tag" style="font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.05); color: var(--text-muted);">Eylem: Yok</span>
+                            </div>
+                            <button onclick="clearMCLogs()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.8rem;"><i class="fa-solid fa-trash"></i> Temizle</button>
+                        </div>
+
+                        <div id="mcbot-terminal" style="background: #0d0d12; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; font-family: 'Fira Code', monospace; font-size: 0.85rem; height: 380px; overflow-y: auto; color: #a9b1d6; white-space: pre-wrap; line-height: 1.5;">
+[SİSTEM] Bot başlatılmadı. Sunucu IP ve Port girip "Botu Sok" butonuna tıklayın.
+                        </div>
+
+                        <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
+                            <input type="text" id="mcbot-command-input" placeholder="Komut yazın... (Örn: yardım, gez, kaz taş, takip et, dur)" style="flex: 1; padding: 0.75rem 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-family: 'Fira Code', monospace;" onkeypress="if(event.key==='Enter') sendMCBotCommand()">
+                            <button class="btn-primary" onclick="sendMCBotCommand()" style="padding: 0 1.25rem;"><i class="fa-solid fa-paper-plane"></i> Gönder</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="view-project-detail" class="view">
                 <div class="header">
                     <div class="back-nav" onclick="switchView('projects')"><i class="fa-solid fa-arrow-left"></i></div>
@@ -235,6 +311,7 @@
     <script src="/js/dashboard.js"></script>
 </body>
 </html>
+
 
 
 

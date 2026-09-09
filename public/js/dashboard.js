@@ -80,6 +80,7 @@ function switchView(viewId) {
     const link = document.querySelector('#main-menu a[data-view="' + viewId + '"]');
     if (link) link.classList.add('active');
     if (viewId === 'projects') loadProjects();
+    if (viewId === 'mcbot') startMCStatusPolling();
     if (viewId === 'project-detail' && currentProject && editor) { setTimeout(() => editor.refresh(), 100); }
 
     // Sidebar toggle: proje detayindaysa proje menusunu goster
@@ -492,3 +493,166 @@ async function checkMaintenance() {
 setInterval(checkMaintenance, 30000);
 document.addEventListener('DOMContentLoaded', checkMaintenance);
 
+
+
+
+// ==========================================
+// MINECRAFT BOT SISTEMI
+// ==========================================
+let mcStatusInterval = null;
+
+async function spawnMCBot() {
+    const host = document.getElementById('mc-host').value.trim();
+    const port = document.getElementById('mc-port').value.trim();
+    const username = document.getElementById('mc-username').value.trim();
+
+    if (!host) {
+        alert('Lütfen sunucu IP adresini girin!');
+        return;
+    }
+
+    const btnConnect = document.getElementById('btn-mc-connect');
+    btnConnect.disabled = true;
+    btnConnect.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Bağlanıyor...';
+
+    try {
+        const res = await fetch('/api/mcbot/spawn', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ host, port, username })
+        });
+        const data = await res.json();
+        if (data.success) {
+            appendMCLog('[SİSTEM] ' + data.message);
+            startMCStatusPolling();
+        } else {
+            alert(data.message || 'Bağlantı hatası!');
+        }
+    } catch (err) {
+        alert('Sunucuya istek gönderilemedi.');
+    } finally {
+        btnConnect.disabled = false;
+        btnConnect.innerHTML = '<i class="fa-solid fa-rocket"></i> Botu Sok';
+    }
+}
+
+async function stopMCBot() {
+    if (!confirm('Botun bağlantısını kesmek istediğinize emin misiniz?')) return;
+    try {
+        const res = await fetch('/api/mcbot/stop', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            appendMCLog('[SİSTEM] ' + data.message);
+            fetchMCStatus();
+        } else {
+            alert(data.message);
+        }
+    } catch (err) {
+        alert('Durdurulamadı.');
+    }
+}
+
+async function sendMCBotCommand(cmdOverride) {
+    const input = document.getElementById('mcbot-command-input');
+    const cmd = cmdOverride || (input ? input.value.trim() : '');
+    if (!cmd) return;
+
+    if (!cmdOverride && input) input.value = '';
+
+    try {
+        const res = await fetch('/api/mcbot/command', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ command: cmd })
+        });
+        const data = await res.json();
+        if (!data.success && data.message) {
+            appendMCLog('[HATA] ' + data.message);
+        }
+        fetchMCStatus();
+    } catch (err) {
+        appendMCLog('[HATA] Komut gönderilemedi.');
+    }
+}
+
+function quickMCCommand(cmd) {
+    sendMCBotCommand(cmd);
+}
+
+function quickMCPrompt(prefix) {
+    if (prefix === 'kaz') {
+        const block = prompt('Kazılacak blok adını Türkçe yazın (Örn: taş, odun, demir, toprak, kömür, elmas):');
+        if (block) sendMCBotCommand('kaz ' + block);
+    } else if (prefix === 'mesaj yaz') {
+        const msg = prompt('Sunucuda yazılacak mesajı girin:');
+        if (msg) sendMCBotCommand('mesaj yaz ' + msg);
+    }
+}
+
+async function fetchMCStatus() {
+    try {
+        const res = await fetch('/api/mcbot/status');
+        const data = await res.json();
+        if (!data.success) return;
+
+        const badge = document.getElementById('mcbot-status-badge');
+        const btnConnect = document.getElementById('btn-mc-connect');
+        const btnDisconnect = document.getElementById('btn-mc-disconnect');
+        const actionTag = document.getElementById('mcbot-action-tag');
+        const terminal = document.getElementById('mcbot-terminal');
+
+        if (badge) {
+            if (data.connected) {
+                badge.textContent = 'Bağlı (' + data.username + ')';
+                badge.style.background = 'rgba(80,250,123,0.15)';
+                badge.style.color = '#50fa7b';
+                if (btnConnect) btnConnect.style.display = 'none';
+                if (btnDisconnect) btnDisconnect.style.display = 'inline-block';
+            } else if (data.exists) {
+                badge.textContent = 'Bağlanıyor...';
+                badge.style.background = 'rgba(255,184,108,0.15)';
+                badge.style.color = '#ffb86c';
+                if (btnConnect) btnConnect.style.display = 'none';
+                if (btnDisconnect) btnDisconnect.style.display = 'inline-block';
+            } else {
+                badge.textContent = 'Bağlantı Yok';
+                badge.style.background = 'rgba(255,255,255,0.05)';
+                badge.style.color = 'var(--text-muted)';
+                if (btnConnect) btnConnect.style.display = 'inline-block';
+                if (btnDisconnect) btnDisconnect.style.display = 'none';
+            }
+        }
+
+        if (actionTag) {
+            actionTag.textContent = 'Eylem: ' + (data.action || 'Yok');
+        }
+
+        if (terminal && data.logs && data.logs.length > 0) {
+            terminal.textContent = data.logs.join('\n');
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+    } catch (e) {}
+}
+
+function appendMCLog(text) {
+    const terminal = document.getElementById('mcbot-terminal');
+    if (!terminal) return;
+    terminal.textContent += '\n' + text;
+    terminal.scrollTop = terminal.scrollHeight;
+}
+
+function clearMCLogs() {
+    const terminal = document.getElementById('mcbot-terminal');
+    if (terminal) terminal.textContent = '';
+}
+
+function startMCStatusPolling() {
+    fetchMCStatus();
+    if (!mcStatusInterval) {
+        mcStatusInterval = setInterval(fetchMCStatus, 2500);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetchMCStatus();
+});

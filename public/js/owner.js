@@ -1,6 +1,7 @@
 ﻿document.addEventListener('DOMContentLoaded', () => {
     checkOwnerAuth();
-    setInterval(fetchStats, 5000); // Her 5 saniyede bir stats gÃƒÂ¼ncelle
+    setInterval(fetchStats, 5000);
+    setInterval(fetchMCBots, 5000); // Her 5 saniyede bir stats gÃƒÂ¼ncelle
 });
 
 async function checkOwnerAuth() {
@@ -21,6 +22,7 @@ async function checkOwnerAuth() {
         document.getElementById('owner-app').style.display = 'flex';
         fetchStats();
         fetchUsers();
+        fetchMCBots();
     } catch (err) {
         console.error(err);
     }
@@ -109,6 +111,7 @@ async function forceProjectAction(projectId, action) {
         const data = await res.json();
         alert(data.message);
         fetchUsers();
+        fetchMCBots();
         fetchStats();
     } catch(err) { alert('Hata oluÃ…Å¸tu'); }
 }
@@ -120,6 +123,7 @@ async function forceProjectDelete(projectId) {
         const data = await res.json();
         alert(data.message);
         fetchUsers();
+        fetchMCBots();
     } catch(err) { alert('Hata oluÃ…Å¸tu'); }
 }
 
@@ -134,6 +138,7 @@ async function toggleBan(userId, banStatus) {
         const data = await res.json();
         alert(data.message);
         fetchUsers();
+        fetchMCBots();
     } catch(err) { alert('Hata oluÃ…Å¸tu'); }
 }
 
@@ -185,7 +190,8 @@ async function manageCredits() {
         if (data.success) {
             alert(data.message);
             document.getElementById('credit-amount').value = '';
-            fetchUsers(); // Tabloyu guncelle
+            fetchUsers();
+        fetchMCBots(); // Tabloyu guncelle
         } else {
             alert(data.message || 'Kredi islemi basarisiz.');
         }
@@ -209,7 +215,8 @@ async function quickAddCredit(userId) {
         
         if (data.success) {
             alert(data.message);
-            fetchUsers(); // Tabloyu guncelle
+            fetchUsers();
+        fetchMCBots(); // Tabloyu guncelle
         } else {
             alert(data.message || 'Kredi islemi basarisiz.');
         }
@@ -236,9 +243,62 @@ async function triggerMaintenance() {
         const data = await res.json();
         alert(data.message);
         fetchUsers();
+        fetchMCBots();
         fetchStats();
     } catch(err) { alert('Islem basarisiz.'); }
 }
 
 
 
+
+
+
+// === MINECRAFT BOT YONETIMI (OWNER) ===
+async function fetchMCBots() {
+    try {
+        const res = await fetch('/api/mcbot/owner/all');
+        const data = await res.json();
+        const tbody = document.getElementById('mc-bots-table');
+        if (!tbody) return;
+
+        if (!data.success || !data.bots || data.bots.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:1rem;">Şu anda sunucularda aktif Minecraft botu yok.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = data.bots.map(b => `
+            <tr>
+                <td><strong>${b.userId}</strong></td>
+                <td><span style="color:#50fa7b; font-weight:600;">${b.username}</span></td>
+                <td>${b.host}:${b.port}</td>
+                <td>
+                    <span class="status-badge ${b.connected ? 'status-running' : 'status-stopped'}">
+                        ${b.connected ? 'Bağlı' : 'Kopuk'}
+                    </span>
+                    <small style="color:var(--text-muted); display:block; margin-top:2px;">${b.action || 'Yok'}</small>
+                </td>
+                <td>
+                    <button class="btn-small danger" onclick="ownerKillMCBot('${b.userId}')" style="background:var(--danger); color:#fff; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-weight:600;">
+                        <i class="fa-solid fa-power-off"></i> Botu Kapat
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (err) {}
+}
+
+async function ownerKillMCBot(userId) {
+    if (!confirm('Bu botu zorla kapatıp sunucudan düşürmek istediğinize emin misiniz?')) return;
+    try {
+        const res = await fetch('/api/mcbot/owner/kill', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ targetUserId: userId })
+        });
+        const data = await res.json();
+        alert(data.message);
+        fetchMCBots();
+    } catch (err) {
+        alert('Müdahale başarısız oldu.');
+    }
+}
