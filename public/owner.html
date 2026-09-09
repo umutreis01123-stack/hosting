@@ -26,7 +26,7 @@
                     </div>
                 </div>
                 <div class="stat-box">
-                    <i class="fa-solid fa-memory text-APEX"></i>
+                    <i class="fa-solid fa-memory" style="color:#bd93f9;"></i>
                     <div>
                         <span class="label">RAM</span>
                         <strong id="stat-ram">0 / 0 GB</strong>
@@ -68,10 +68,54 @@
                 </div>
             </div>
 
-            <div class="panel" style="margin-top: 1.5rem;">
+            <!-- Sağ: Araçlar (Duyuru, Bakım, Kredi) -->
+            <div class="side-panel">
+                <div class="panel">
+                    <div class="panel-header">Genel Duyuru Yayınla</div>
+                    <div class="panel-body">
+                        <input type="text" id="ann-title" class="form-input" placeholder="Duyuru Başlığı" style="margin-bottom: 10px;">
+                        <textarea id="ann-msg" class="form-input" rows="4" placeholder="Duyuru Mesajı..." style="margin-bottom: 10px;"></textarea>
+                        <select id="ann-type" class="form-input" style="margin-bottom: 10px;">
+                            <option value="info">Bilgi (Mavi)</option>
+                            <option value="success">İyi Haber (Yeşil)</option>
+                            <option value="warning">Uyarı (Sarı)</option>
+                            <option value="danger">Acil (Kırmızı)</option>
+                        </select>
+                        <button class="btn-primary w-100" onclick="sendAnnouncement()">Yayınla</button>
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-top: 1rem;">
+                    <div class="panel-header">Sistem Kontrolü</div>
+                    <div class="panel-body">
+                        <button class="btn-primary danger w-100" onclick="triggerMaintenance()"><i class="fa-solid fa-triangle-exclamation"></i> Bakım Modu (Tüm Botları Durdur)</button>
+                        <p style="color:var(--text-muted); font-size: 0.8rem; margin-top: 10px;">
+                            Dikkat: Bu işlem sunucudaki tüm çalışan bot ve siteleri etkiler.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Kredi Yönetimi Paneli -->
+                <div class="panel" style="margin-top: 1rem;">
+                    <div class="panel-header"><i class="fa-solid fa-coins"></i> Kredi Yönetimi</div>
+                    <div class="panel-body">
+                        <input type="text" id="credit-user-id" class="form-input" placeholder="Kullanıcı (Discord ID)" style="margin-bottom: 10px;">
+                        <input type="number" id="credit-amount" class="form-input" placeholder="Miktar (Örn: 100 = 1 Gün)" style="margin-bottom: 10px;">
+                        <select id="credit-action" class="form-input" style="margin-bottom: 10px;">
+                            <option value="add">Kredi Ekle (+)</option>
+                            <option value="set">Krediyi Ayarla (=)</option>
+                            <option value="reset">Krediyi Sıfırla (Miktar: 0)</option>
+                        </select>
+                        <button class="btn-primary success w-100" onclick="manageCredits()">İşlemi Uygula</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ALT KISIM: Aktif Minecraft Botları (Tam Genişlik) -->
+            <div class="panel" style="grid-column: 1 / -1; margin-top: 0.5rem;">
                 <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
                     <span><i class="fa-solid fa-cube" style="color: #50fa7b;"></i> Aktif Minecraft Botları</span>
-                    <button onclick="fetchMCBots()" style="background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: #fff; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem;">
+                    <button onclick="fetchMCBots()" style="background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: #fff; cursor: pointer; padding: 5px 12px; border-radius: 6px; font-size: 0.8rem;">
                         <i class="fa-solid fa-rotate"></i> Yenile
                     </button>
                 </div>
@@ -87,52 +131,9 @@
                             </tr>
                         </thead>
                         <tbody id="mc-bots-table">
-                            <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Yükleniyor...</td></tr>
+                            <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Yükleniyor...</td></tr>
                         </tbody>
                     </table>
-                </div>
-            </div>
-
-            <!-- Sağ: Açraçlar (Duyuru, Detaylar) -->
-            <div class="side-panel">
-                <div class="panel">
-                    <div class="panel-header">Genel Duyuru Yayınla</div>
-                    <div class="panel-body">
-                        <input type="text" id="ann-title" class="form-input" placeholder="Duyuru Başlığı" style="margin-bottom: 10px;">
-                        <textarea id="ann-msg" class="form-input" rows="4" placeholder="Duyuru Mesajı..." style="margin-bottom: 10px;"></textarea>
-                        <select id="ann-type" class="form-input" style="margin-bottom: 10px;">
-                            <option value="info">Bilgi (Mavi)</option>
-                            <option value="success">İyi Haber (Yeşil)</option>
-                            <option value="warning">Uyarıı (Sarıı)</option>
-                            <option value="danger">Açcil (Kırmızı)</option>
-                        </select>
-                        <button class="btn-primary w-100" onclick="sendAnnouncement()">Yayınla</button>
-                    </div>
-                </div>
-
-                <div class="panel" style="margin-top: 1rem;">
-                    <div class="panel-header">Sistem Kontrolü/div>
-                    <div class="panel-body">
-                        <button class="btn-primary danger w-100" onclick="triggerMaintenance()"><i class="fa-solid fa-triangle-exclamation"></i> Bakım Modu (Tüm Botları Durdur)</button>
-                        <p style="color:var(--text-muted); font-size: 0.8rem; margin-top: 10px;">
-                            Dikkat: Bu işlemler sunucudaki Tüm çalışan bot ve siteleri etkiler.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Kredi Yönetimi Paneli -->
-                <div class="panel" style="margin-top: 1rem;">
-                    <div class="panel-header"><i class="fa-solid fa-coins"></i> Kredi Yönetimi</div>
-                    <div class="panel-body">
-                        <input type="text" id="credit-user-id" class="form-input" placeholder="Kullanıcı (Discord ID)" style="margin-bottom: 10px;">
-                        <input type="number" id="credit-amount" class="form-input" placeholder="Miktar (Örn: 100 = 1 Gün)" style="margin-bottom: 10px;">
-                        <select id="credit-action" class="form-input" style="margin-bottom: 10px;">
-                            <option value="add">Kredi Ekle (+)</option>
-                            <option value="set">Krediyi Açyarla (=)</option>
-                            <option value="reset">Krediyi Sıfırla (Miktar: 0)</option>
-                        </select>
-                        <button class="btn-primary success w-100" onclick="manageCredits()">İşlemi Uygula</button>
-                    </div>
                 </div>
             </div>
         </main>
@@ -141,8 +142,3 @@
     <script src="/js/owner.js"></script>
 </body>
 </html>
-
-
-
-
-
