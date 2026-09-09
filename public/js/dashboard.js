@@ -581,11 +581,37 @@ function quickMCCommand(cmd) {
 
 function quickMCPrompt(prefix) {
     if (prefix === 'kaz') {
-        const block = prompt('Kazılacak blok adını Türkçe yazın (Örn: taş, odun, demir, toprak, kömür, elmas):');
-        if (block) sendMCBotCommand('kaz ' + block);
+        const block = prompt('Kazılacak blok adını Türkçe yazın (Örn: taş, odun, demir, toprak):');
+        if (!block) return;
+        const amount = prompt('Kaç adet kazılacak? (Örn: 10, Boş bırakırsanız 1 adet kazar):');
+        let cmd = 'kaz ' + block;
+        if (amount && !isNaN(amount)) cmd += ' ' + amount.trim();
+        sendMCBotCommand(cmd);
     } else if (prefix === 'mesaj yaz') {
         const msg = prompt('Sunucuda yazılacak mesajı girin:');
         if (msg) sendMCBotCommand('mesaj yaz ' + msg);
+    } else if (prefix === 'saldır') {
+        const target = prompt('Saldırılacak hedefin adı (Boş bırakırsanız en yakındakine saldırır):');
+        if (target !== null) sendMCBotCommand('saldır ' + target.trim());
+    }
+}
+
+let otoMesajAcik = false;
+function toggleMCOtoMesaj() {
+    otoMesajAcik = !otoMesajAcik;
+    const btn = document.getElementById('btn-oto-mesaj');
+    if (otoMesajAcik) {
+        btn.textContent = '💬 oto mesaj: AÇIK';
+        btn.style.background = 'rgba(80,250,123,0.25)';
+        btn.style.color = '#50fa7b';
+        btn.style.borderColor = 'rgba(80,250,123,0.5)';
+        sendMCBotCommand('otomesaj aç');
+    } else {
+        btn.textContent = '💬 oto mesaj: KAPALI';
+        btn.style.background = 'rgba(139,233,253,0.15)';
+        btn.style.color = '#8be9fd';
+        btn.style.borderColor = 'rgba(139,233,253,0.3)';
+        sendMCBotCommand('otomesaj kapat');
     }
 }
 
@@ -608,7 +634,7 @@ async function fetchMCStatus() {
                 badge.style.color = '#50fa7b';
                 if (btnConnect) btnConnect.style.display = 'none';
                 if (btnDisconnect) btnDisconnect.style.display = 'inline-block';
-            } else if (data.exists) {
+            } else if (data.exists && data.action === 'Bağlanıyor...') {
                 badge.textContent = 'Bağlanıyor...';
                 badge.style.background = 'rgba(255,184,108,0.15)';
                 badge.style.color = '#ffb86c';
@@ -656,3 +682,4 @@ function startMCStatusPolling() {
 document.addEventListener('DOMContentLoaded', () => {
     fetchMCStatus();
 });
+

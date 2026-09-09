@@ -188,8 +188,11 @@
                                 <button type="button" onclick="quickMCCommand('gez')" style="background: rgba(80,250,123,0.15); color: #50fa7b; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(80,250,123,0.3); cursor: pointer; font-size: 0.8rem;">🚶 gez</button>
                                 <button type="button" onclick="quickMCCommand('dur')" style="background: rgba(255,85,85,0.15); color: #ff5555; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,85,85,0.3); cursor: pointer; font-size: 0.8rem;">🛑 dur</button>
                                 <button type="button" onclick="quickMCCommand('takip et')" style="background: rgba(189,147,249,0.15); color: #bd93f9; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(189,147,249,0.3); cursor: pointer; font-size: 0.8rem;">🏃 takip et</button>
-                                <button type="button" onclick="quickMCPrompt('kaz')" style="background: rgba(255,184,108,0.15); color: #ffb86c; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,184,108,0.3); cursor: pointer; font-size: 0.8rem;">⛏️ kaz ...</button>
-                                <button type="button" onclick="quickMCPrompt('mesaj yaz')" style="background: rgba(139,233,253,0.15); color: #8be9fd; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(139,233,253,0.3); cursor: pointer; font-size: 0.8rem;">💬 mesaj yaz ...</button>
+                                <button type="button" onclick="quickMCPrompt('kaz')" style="background: rgba(255,184,108,0.15); color: #ffb86c; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,184,108,0.3); cursor: pointer; font-size: 0.8rem;">⛏️ kaz...</button>
+                                <button type="button" onclick="quickMCPrompt('saldır')" style="background: rgba(255,85,85,0.25); color: #ff5555; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,85,85,0.5); cursor: pointer; font-size: 0.8rem; font-weight:bold;">⚔️ saldır...</button>
+                                <button type="button" onclick="quickMCCommand('tpa kabul')" style="background: rgba(80,250,123,0.25); color: #50fa7b; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(80,250,123,0.5); cursor: pointer; font-size: 0.8rem;">✅ tpa kabul</button>
+                                <button type="button" onclick="quickMCCommand('tpa reddet')" style="background: rgba(255,85,85,0.25); color: #ff5555; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,85,85,0.5); cursor: pointer; font-size: 0.8rem;">❌ tpa ret</button>
+                                <button type="button" id="btn-oto-mesaj" onclick="toggleMCOtoMesaj()" style="background: rgba(139,233,253,0.15); color: #8be9fd; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(139,233,253,0.3); cursor: pointer; font-size: 0.8rem;">💬 oto mesaj: kapalı</button>
                             </div>
                         </div>
                     </div>
@@ -311,6 +314,7 @@
     <script src="/js/dashboard.js"></script>
 </body>
 </html>
+
 
 
 

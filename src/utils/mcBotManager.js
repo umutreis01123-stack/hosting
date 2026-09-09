@@ -33,6 +33,20 @@ const TURKISH_BLOCKS = {
     'obsidyen': ['obsidian']
 };
 
+const RANDOM_MESSAGES = [
+    "selam herkese",
+    "kolay gelsin",
+    "lag var mı beyler",
+    "xp kasan var mı",
+    "burası neresi",
+    "odun satan var mı",
+    "iyi oyunlar",
+    "klana alım var mı",
+    "fırın lazım acil",
+    "server güzelmiş elinize sağlık",
+    "merhaba"
+];
+
 class MCBotManager {
     constructor() {
         this.bots = new Map();
@@ -50,7 +64,7 @@ class MCBotManager {
     spawnBot(userId, username, host, port) {
         if (this.bots.has(userId)) {
             const current = this.bots.get(userId);
-            if (current.connected) {
+            if (current.connected || current.action === 'Bağlanıyor...') {
                 return { success: false, message: 'Zaten aktif bir botunuz var! Önce bağlantısını kesin.' };
             }
             this.killBot(userId);
@@ -66,9 +80,12 @@ class MCBotManager {
             port: parsedPort,
             connected: false,
             logs: [],
-            action: 'Yok',
+            action: 'Bağlanıyor...',
             bot: null,
-            wanderInterval: null
+            wanderInterval: null,
+            randomChatInterval: null,
+            attackInterval: null,
+            mineInterval: null
         };
         this.bots.set(userId, botData);
 
@@ -90,6 +107,7 @@ class MCBotManager {
 
             bot.once('spawn', () => {
                 botData.connected = true;
+                botData.action = 'Yok';
                 this.addLog(userId, `✅ Sunucuya başarıyla girildi! (Sürüm: ${bot.version || 'Otomatik'})`);
                 this.addLog(userId, `💡 Komut listesi için konsola "yardım" yazabilirsiniz.`);
 
@@ -102,11 +120,13 @@ class MCBotManager {
             bot.on('chat', (sender, message) => {
                 if (sender === bot.username) return;
                 this.addLog(userId, `[CHAT] <${sender}>: ${message}`);
+                this.checkTpa(userId, message);
             });
 
             bot.on('messagestr', (message) => {
                 if (!message || message.trim() === '') return;
                 this.addLog(userId, `[SUNUCU]: ${message}`);
+                this.checkTpa(userId, message);
             });
 
             bot.on('kicked', (reason) => {
@@ -115,8 +135,7 @@ class MCBotManager {
                     parsedReason = typeof reason === 'string' ? reason : JSON.stringify(reason);
                 } catch (e) {}
                 this.addLog(userId, `❌ Sunucudan atıldı: ${parsedReason}`);
-                botData.connected = false;
-                this.stopCurrentAction(userId);
+                this.killBot(userId); // Tamamen temizle
             });
 
             bot.on('error', (err) => {
@@ -125,31 +144,43 @@ class MCBotManager {
 
             bot.on('end', (reason) => {
                 this.addLog(userId, `🔌 Bağlantı sonlandı: ${reason || 'Bilinmiyor'}`);
-                botData.connected = false;
-                this.stopCurrentAction(userId);
+                this.killBot(userId); // Tamamen temizle
             });
 
             return { success: true, message: 'Bot başlatıldı, sunucuya bağlanıyor...', username: botUsername };
         } catch (error) {
             this.addLog(userId, `❌ Başlatma hatası: ${error.message}`);
+            this.bots.delete(userId); // Hata varsa temizle
             return { success: false, message: error.message };
+        }
+    }
+    
+    checkTpa(userId, message) {
+        const lowerMsg = message.toLowerCase();
+        if (lowerMsg.includes('tpa ') || lowerMsg.includes('teleport') || lowerMsg.includes('ışınlanma isteği')) {
+            this.addLog(userId, `🔔 [TPA İSTEĞİ] Bir ışınlanma isteği algılanmış olabilir! Kabul için "tpa kabul", red için "tpa reddet" yazın.`);
         }
     }
 
     stopCurrentAction(userId) {
         const botData = this.bots.get(userId);
         if (!botData) return;
-        if (botData.wanderInterval) {
-            clearInterval(botData.wanderInterval);
-            botData.wanderInterval = null;
-        }
+        
+        if (botData.wanderInterval) clearInterval(botData.wanderInterval);
+        if (botData.attackInterval) clearInterval(botData.attackInterval);
+        if (botData.mineInterval) clearInterval(botData.mineInterval);
+        
+        botData.wanderInterval = null;
+        botData.attackInterval = null;
+        botData.mineInterval = null;
+        
         if (botData.bot && botData.bot.pathfinder) {
             botData.bot.pathfinder.setGoal(null);
         }
         if (botData.bot) {
             botData.bot.clearControlStates();
         }
-        botData.action = 'Yok';
+        if(botData.connected) botData.action = 'Yok';
     }
 
     handleCommand(userId, rawCommand) {
@@ -172,13 +203,47 @@ class MCBotManager {
         // 1. yardım
         if (lower === 'yardım' || lower === 'yardim' || lower === 'help') {
             this.addLog(userId, '══════════ KOMUT LİSTESİ ══════════');
-            this.addLog(userId, '• yardım               : Bu menüyü gösterir.');
-            this.addLog(userId, '• gez                  : Bot etrafta rastgele dolaşır.');
-            this.addLog(userId, '• kaz <blok_ismi>      : Belirtilen bloğu arar ve kazar (Örn: kaz taş, kaz odun, kaz demir).');
+            this.addLog(userId, '• gez                  : Etrafta rastgele dolaşır.');
+            this.addLog(userId, '• kaz <blok> [miktar]  : Belirtilen bloğu arar ve kazar (Örn: kaz taş 10).');
             this.addLog(userId, '• takip et [oyuncu]    : Belirtilen veya en yakın oyuncuyu takip eder.');
-            this.addLog(userId, '• mesaj yaz <mesaj>    : Sunucu sohbetine mesaj gönderir.');
-            this.addLog(userId, '• dur                  : Gezme, kazma veya takibi durdurur.');
+            this.addLog(userId, '• saldır [hedef]       : En yakın yaratığa/oyuncuya saldırır.');
+            this.addLog(userId, '• mesaj yaz <mesaj>    : Sohbete mesaj gönderir.');
+            this.addLog(userId, '• otomesaj aç/kapat    : Arada bir rastgele Türkçe sohbet mesajları atar.');
+            this.addLog(userId, '• tpa kabul / reddet   : Gelen ışınlanma isteğini onaylar/reddeder.');
+            this.addLog(userId, '• dur                  : Gezme, kazma, saldırı veya takibi durdurur.');
             this.addLog(userId, '═══════════════════════════════════');
+            return { success: true };
+        }
+
+        // TPA
+        if (lower === 'tpa kabul' || lower === 'tpaccept') {
+            bot.chat('/tpaccept');
+            this.addLog(userId, '✅ TPA kabul edildi.');
+            return { success: true };
+        }
+        if (lower === 'tpa reddet' || lower === 'tpdeny') {
+            bot.chat('/tpdeny');
+            this.addLog(userId, '❌ TPA reddedildi.');
+            return { success: true };
+        }
+        
+        // OTO MESAJ
+        if (lower === 'otomesaj aç' || lower === 'otomesaj ac') {
+            if (botData.randomChatInterval) clearInterval(botData.randomChatInterval);
+            botData.randomChatInterval = setInterval(() => {
+                if (botData.connected && bot) {
+                    const msg = RANDOM_MESSAGES[Math.floor(Math.random() * RANDOM_MESSAGES.length)];
+                    bot.chat(msg);
+                    this.addLog(userId, `💬 [OtoMesaj]: ${msg}`);
+                }
+            }, 45000); // 45 saniyede bir
+            this.addLog(userId, '✅ Otomatik rastgele sohbet mesajları açıldı (45sn).');
+            return { success: true };
+        }
+        if (lower === 'otomesaj kapat') {
+            if (botData.randomChatInterval) clearInterval(botData.randomChatInterval);
+            botData.randomChatInterval = null;
+            this.addLog(userId, '🛑 Otomatik sohbet mesajları kapatıldı.');
             return { success: true };
         }
 
@@ -189,7 +254,48 @@ class MCBotManager {
             return { success: true };
         }
 
-        // 3. gez
+        // 3. saldır
+        if (lower.startsWith('saldır') || lower.startsWith('saldir') || lower.startsWith('attack')) {
+            const targetName = lower.replace(/^(saldır|saldir|attack)\s*/i, '').trim();
+            this.stopCurrentAction(userId);
+            
+            let targetEntity = null;
+            if (targetName) {
+                targetEntity = bot.nearestEntity(e => (e.username && e.username.toLowerCase() === targetName) || (e.name && e.name.toLowerCase() === targetName));
+            } else {
+                targetEntity = bot.nearestEntity(e => e.type === 'player' || e.type === 'mob');
+            }
+
+            if (!targetEntity) {
+                this.addLog(userId, '❌ Yakında saldırılacak uygun hedef bulunamadı.');
+                return { success: false, message: 'Hedef bulunamadı.' };
+            }
+
+            botData.action = `Saldırıyor: ${targetEntity.username || targetEntity.name}`;
+            this.addLog(userId, `⚔️ ${targetEntity.username || targetEntity.name} hedefine saldırı başlatıldı!`);
+
+            botData.attackInterval = setInterval(() => {
+                if (!botData.connected || botData.action !== `Saldırıyor: ${targetEntity.username || targetEntity.name}`) return clearInterval(botData.attackInterval);
+                if (!targetEntity.isValid) {
+                    this.addLog(userId, '✅ Hedef yok edildi veya menzilden çıktı.');
+                    this.stopCurrentAction(userId);
+                    return;
+                }
+                
+                if (pathfinderPkg && bot.pathfinder) {
+                    bot.pathfinder.setGoal(new pathfinderPkg.goals.GoalFollow(targetEntity, 1.5), true);
+                } else {
+                    bot.lookAt(targetEntity.position.offset(0, targetEntity.height, 0));
+                }
+                
+                if (bot.entity.position.distanceTo(targetEntity.position) <= 3) {
+                    bot.attack(targetEntity);
+                }
+            }, 800);
+            return { success: true };
+        }
+
+        // 4. gez
         if (lower === 'gez' || lower === 'wander') {
             this.stopCurrentAction(userId);
             botData.action = 'Geziniyor';
@@ -215,65 +321,90 @@ class MCBotManager {
             return { success: true };
         }
 
-        // 4. kaz <blok_ismi>
+        // 5. kaz <blok_ismi> [miktar]
         if (lower.startsWith('kaz ') || lower.startsWith('mine ')) {
-            const blockInput = lower.replace(/^(kaz|mine)\s+/, '').trim();
+            const args = lower.replace(/^(kaz|mine)\s+/, '').trim().split(' ');
+            let amount = 1;
+            let blockInput = args[0];
+            
+            if (args.length > 1 && !isNaN(args[args.length - 1])) {
+                amount = parseInt(args[args.length - 1], 10);
+                blockInput = args.slice(0, -1).join(' ');
+            } else {
+                blockInput = args.join(' ');
+            }
+
             if (!blockInput) {
-                this.addLog(userId, '⚠️ Lütfen kazılacak blok adını belirtin. Örnek: kaz taş');
+                this.addLog(userId, '⚠️ Lütfen kazılacak blok adını belirtin. Örnek: kaz taş 10');
                 return { success: false, message: 'Blok adı gerekli' };
             }
 
             this.stopCurrentAction(userId);
-            botData.action = `Kazıyor: ${blockInput}`;
+            botData.action = `Kazıyor: ${blockInput} (${amount} adet)`;
 
             const possibleNames = TURKISH_BLOCKS[blockInput] || [blockInput];
-            this.addLog(userId, `🔍 "${blockInput}" bloğu aranıyor...`);
+            this.addLog(userId, `🔍 "${blockInput}" bloğundan ${amount} adet aranıp kazılacak...`);
 
-            const block = bot.findBlock({
-                matching: (b) => possibleNames.some(name => b.name.includes(name)),
-                maxDistance: 32
-            });
+            let minedCount = 0;
 
-            if (!block) {
-                this.addLog(userId, `❌ Yakında "${blockInput}" bloğu bulunamadı (32 blok menzil).`);
-                botData.action = 'Yok';
-                return { success: false, message: 'Blok bulunamadı.' };
-            }
+            const mineNextBlock = () => {
+                if (botData.action !== `Kazıyor: ${blockInput} (${amount} adet)`) return;
+                
+                if (minedCount >= amount) {
+                    this.addLog(userId, `✅ Görev Tamamlandı: ${amount} adet ${blockInput} kazıldı!`);
+                    this.stopCurrentAction(userId);
+                    return;
+                }
 
-            this.addLog(userId, `⛏️ Blok bulundu (${block.name} @ ${block.position}), kazmaya gidiliyor...`);
-
-            if (pathfinderPkg && bot.pathfinder) {
-                bot.pathfinder.setGoal(new pathfinderPkg.goals.GoalBlock(block.position.x, block.position.y, block.position.z));
-                const checkArrival = setInterval(() => {
-                    if (botData.action !== `Kazıyor: ${blockInput}`) {
-                        clearInterval(checkArrival);
-                        return;
-                    }
-                    if (bot.entity.position.distanceTo(block.position) <= 4.5) {
-                        clearInterval(checkArrival);
-                        bot.pathfinder.setGoal(null);
-                        bot.dig(block, (err) => {
-                            if (err) {
-                                this.addLog(userId, `⚠️ Kazma hatası: ${err.message}`);
-                            } else {
-                                this.addLog(userId, '✅ Blok başarıyla kazıldı!');
-                            }
-                            botData.action = 'Yok';
-                        });
-                    }
-                }, 500);
-            } else {
-                bot.lookAt(block.position);
-                bot.dig(block, (err) => {
-                    if (err) this.addLog(userId, `⚠️ Kazma hatası: ${err.message}`);
-                    else this.addLog(userId, '✅ Blok kazıldı!');
-                    botData.action = 'Yok';
+                const block = bot.findBlock({
+                    matching: (b) => possibleNames.some(name => b.name.includes(name)),
+                    maxDistance: 32
                 });
-            }
+
+                if (!block) {
+                    this.addLog(userId, `❌ Yakında "${blockInput}" bloğu bulunamadı (Kazılan: ${minedCount}/${amount}).`);
+                    botData.action = 'Yok';
+                    return;
+                }
+
+                if (pathfinderPkg && bot.pathfinder) {
+                    bot.pathfinder.setGoal(new pathfinderPkg.goals.GoalBlock(block.position.x, block.position.y, block.position.z));
+                    botData.mineInterval = setInterval(() => {
+                        if (botData.action !== `Kazıyor: ${blockInput} (${amount} adet)`) return clearInterval(botData.mineInterval);
+                        
+                        if (bot.entity.position.distanceTo(block.position) <= 4.5) {
+                            clearInterval(botData.mineInterval);
+                            bot.pathfinder.setGoal(null);
+                            bot.dig(block, (err) => {
+                                if (err) {
+                                    this.addLog(userId, `⚠️ Kazma hatası: ${err.message}`);
+                                    this.stopCurrentAction(userId);
+                                } else {
+                                    minedCount++;
+                                    this.addLog(userId, `⛏️ Blok kazıldı! (${minedCount}/${amount})`);
+                                    setTimeout(mineNextBlock, 1000);
+                                }
+                            });
+                        }
+                    }, 500);
+                } else {
+                    bot.lookAt(block.position);
+                    bot.dig(block, (err) => {
+                        if (!err) {
+                            minedCount++;
+                            setTimeout(mineNextBlock, 1000);
+                        } else {
+                            botData.action = 'Yok';
+                        }
+                    });
+                }
+            };
+            
+            mineNextBlock();
             return { success: true };
         }
 
-        // 5. takip et [oyuncu]
+        // 6. takip et [oyuncu]
         if (lower.startsWith('takip et') || lower.startsWith('follow')) {
             const targetPlayerName = cmd.replace(/^(takip et|follow)\s*/i, '').trim();
             this.stopCurrentAction(userId);
@@ -314,7 +445,7 @@ class MCBotManager {
             return { success: true };
         }
 
-        // 6. mesaj yaz <mesaj>
+        // 7. mesaj yaz <mesaj>
         if (lower.startsWith('mesaj yaz ') || lower.startsWith('chat ') || lower.startsWith('say ')) {
             const msg = cmd.replace(/^(mesaj yaz|chat|say)\s+/i, '').trim();
             if (!msg) {
@@ -340,14 +471,18 @@ class MCBotManager {
         if (!botData) return { success: false, message: 'Bot bulunamadı.' };
 
         this.stopCurrentAction(userId);
+        if (botData.randomChatInterval) clearInterval(botData.randomChatInterval);
+        
         if (botData.bot) {
             try {
                 botData.bot.quit('Panel üzerinden bağlantı kesildi.');
             } catch (e) {}
         }
-        botData.connected = false;
-        this.addLog(userId, '🛑 Bot sunucudan çıkarıldı.');
-        return { success: true, message: 'Bot bağlantısı kesildi.' };
+        
+        // BUG FIX: Tamamen map'ten temizleyelim ki frontend "Baglanıyor..." durumunda takılı kalmasın.
+        this.bots.delete(userId);
+        
+        return { success: true, message: 'Bot bağlantısı başarıyla kesildi.' };
     }
 
     getStatus(userId) {
