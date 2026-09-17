@@ -52,9 +52,19 @@ async function startProject(projectId, project) {
     if (fs.existsSync(packageJsonPath)) {
         await runNpmInstall(projectPath);
     }
+    
+    const requirementsTxtPath = path.join(projectPath, 'requirements.txt');
+    if (fs.existsSync(requirementsTxtPath)) {
+        await new Promise((resolve) => {
+            exec('python -m pip install -r requirements.txt', { cwd: projectPath }, (error, stdout, stderr) => {
+                if (error) console.error('[PIP INSTALL ERROR]', error.message);
+                resolve();
+            });
+        });
+    }
 
     // BaÅŸlatma komutunu belirle
-    const { cmd, args } = getStartCommand(project, projectPath);
+    const { cmd, args } = getStartCommand(projectId, project, projectPath);
 
     // SÃ¼reci baÅŸlat
     const proc = spawn(cmd, args, {
@@ -276,9 +286,8 @@ function runNpmInstall(projectPath) {
  * @param {object} project
  * @param {string} projectPath
  */
-function getStartCommand(project, projectPath) {
+function getStartCommand(projectId, project, projectPath) {
     if (project.type === 'website') {
-        // package.json start scripti varsa onu kullan
         const packageJsonPath = path.join(projectPath, 'package.json');
         if (fs.existsSync(packageJsonPath)) {
             const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
@@ -287,16 +296,16 @@ function getStartCommand(project, projectPath) {
             }
         }
         
-        // HTML/Static site â€” basit HTTP sunucu
-        const indexHtml = path.join(projectPath, 'index.html');
-        if (fs.existsSync(indexHtml)) {
-            // npx serve kullan
-            return { cmd: 'npx', args: ['serve', '-s', '.', '-l', getProjectPort(null)] };
-        }
+        const port = getProjectPort(projectId);
+        return { cmd: 'npx', args: ['--yes', 'serve', '-s', '.', '-l', port.toString()] };
     }
     
-    // Discord Bot veya Node.js projesi
     const mainFile = project.mainFile || findMainFile(projectPath);
+    
+    if (project.type === 'python' || mainFile.endsWith('.py')) {
+        return { cmd: 'python', args: [mainFile] };
+    }
+    
     return { cmd: 'node', args: [mainFile] };
 }
 
@@ -313,7 +322,7 @@ function findMainFile(projectPath) {
     }
     
     // YaygÄ±n dosya isimlerini dene
-    const candidates = ['index.js', 'app.js', 'main.js', 'bot.js', 'server.js', 'start.js'];
+    const candidates = ['index.js', 'app.js', 'main.js', 'bot.js', 'server.js', 'start.js', 'main.py', 'bot.py', 'app.py', 'index.py'];
     for (const candidate of candidates) {
         if (fs.existsSync(path.join(projectPath, candidate))) {
             return candidate;
