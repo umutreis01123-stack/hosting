@@ -56,7 +56,7 @@ async function startProject(projectId, project) {
     const requirementsTxtPath = path.join(projectPath, 'requirements.txt');
     if (fs.existsSync(requirementsTxtPath)) {
         await new Promise((resolve) => {
-            exec('python -m pip install -r requirements.txt', { cwd: projectPath }, (error, stdout, stderr) => {
+            exec((process.platform === 'win32' ? 'python' : 'python3') + ' -m pip install -r requirements.txt', { cwd: projectPath }, (error, stdout, stderr) => {
                 if (error) console.error('[PIP INSTALL ERROR]', error.message);
                 resolve();
             });
@@ -303,7 +303,7 @@ function getStartCommand(projectId, project, projectPath) {
     const mainFile = project.mainFile || findMainFile(projectPath);
     
     if (project.type === 'python' || mainFile.endsWith('.py')) {
-        return { cmd: 'python', args: [mainFile] };
+        return { cmd: process.platform === 'win32' ? 'python' : 'python3', args: [mainFile] };
     }
     
     return { cmd: 'node', args: [mainFile] };
