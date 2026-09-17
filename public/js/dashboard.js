@@ -122,7 +122,7 @@ async function openProject(id, name, running) {
     loadFiles(id);
     connectWebSocket(id);
     fetchStatus();
-    loadDnsRecords();
+    
 }
 
 menuLinks.forEach(link => {
@@ -171,7 +171,7 @@ async function openProject(id, name, running) {
     loadFiles(id);
     connectWebSocket(id);
     fetchStatus();
-    loadDnsRecords();
+    
 }
 
 function updateStatusUI(running) {
@@ -394,83 +394,6 @@ function appendChatMessage(text, type) {
 
 
 
-
-
-
-// ==============================
-// V2 Guncellemeleri - Bot Durumu
-// ==============================
-function saveBotStatus() {
-    if (!currentProject) return;
-    const type = document.getElementById('bot-status-type').value;
-    const text = document.getElementById('bot-status-text').value;
-    
-    if (!text) {
-        document.getElementById('bot-status-msg').innerText = 'Lutfen durum metni girin.';
-        return;
-    }
-    
-    fetch('/api/projects/' + currentProject + '/status-config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: type, text: text })
-    })
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById('bot-status-msg').innerText = data.message;
-        document.getElementById('bot-status-msg').style.color = data.success ? 'var(--success)' : 'var(--error)';
-        if(data.success) { setTimeout(() => document.getElementById('bot-status-msg').innerText='', 3000); }
-    });
-}
-
-// ==============================
-// V2 Guncellemeleri - DNS Yonetimi
-// ==============================
-function loadDnsRecords() {
-    if (!currentProject) return;
-    const list = document.getElementById('dns-records-list');
-    list.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Yukleniyor...';
-    
-    fetch('/api/projects/' + currentProject + '/dns')
-    .then(res => res.json())
-    .then(data => {
-        if (!data.success || !data.records || data.records.length === 0) {
-            list.innerHTML = 'Kayit yok';
-            return;
-        }
-        list.innerHTML = data.records.map(r => 
-            '<div style="background:var(--bg);padding:0.4rem;border-radius:4px;margin-bottom:0.4rem;display:flex;justify-content:space-between;">' +
-            '<span><strong style="color:var(--primary)">' + r.type + '</strong> ' + r.name + '</span>' +
-            '<span style="color:var(--text);">' + r.value + '</span>' +
-            '</div>'
-        ).join('');
-    });
-}
-
-function addDnsRecord() {
-    if (!currentProject) return;
-    const type = document.getElementById('dns-type').value;
-    const name = document.getElementById('dns-name').value;
-    const value = document.getElementById('dns-value').value;
-    
-    if (!name || !value) return alert('Ad ve deger zorunludur.');
-    
-    fetch('/api/projects/' + currentProject + '/dns', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: type, name: name, value: value })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById('dns-name').value = '';
-            document.getElementById('dns-value').value = '';
-            loadDnsRecords(); // listeyi yenile
-        } else {
-            alert(data.message);
-        }
-    });
-}
 
 
 
